@@ -4,19 +4,6 @@ from options import *
 from scene1 import scene1
 
 
-class Inventory(RolodexOption):
-    def __init__(self):
-        RolodexOption.__init__(self, "inventory")
-        self.center.set_z(12)
-        self.center.reparent_to(render)
-
-    def hide(self):
-        self.center.hide()
-
-    def show(self):
-        self.center.show()
-
-
 class Interface():
     def __init__(self):
         self.output = render2d.attach_new_node(TextNode("output text"))
