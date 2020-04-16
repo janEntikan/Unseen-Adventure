@@ -12,8 +12,9 @@ class Interface():
         self.output.node().font = base.font
         self.output.set_scale(0.025, 0.025, 0.045)
         self.output.set_z(-0.75)
-        self.to_output = ["","","","",""]
+        self.to_output = ["","","", ""]
         self.inventory = Inventory()
+        self.say("press i for inventory")
 
         # Some debug items:
         lint = Menu("pocket lint")
