@@ -16,12 +16,12 @@ class Interface():
         self.inventory = Inventory()
 
         # Some debug items:
-        lint = MenuOption("pocket lint")
-        lint.add(ReturnOption("look", "that stuff at the bottom of your pocket"))
+        lint = Menu("pocket lint")
+        lint.add(Return("look", "that stuff at the bottom of your pocket"))
         self.inventory.add(lint)
-        hamburger = MenuOption("hamburger")
-        hamburger.add(ReturnOption("look", "a delicious looking hamburger"))
-        hamburger.add(ReturnOption("eat", "you are not hungry right now"))
+        hamburger = Menu("hamburger")
+        hamburger.add(Return("look", "a delicious looking hamburger"))
+        hamburger.add(Return("eat", "you are not hungry right now"))
         self.inventory.add(hamburger)
         self.inventory.hide()
         self.room = scene1()  

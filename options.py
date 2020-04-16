@@ -28,12 +28,16 @@ class Option():
         self.text = make_text(name)
         self.text.reparent_to(self.node)
 
+    def deactivate(self):
+        base.interface.current = self.parent.parent
+
     def update_mimic(self):
         pass
 
     def add(self, option):
         option.node.reparent_to(self.node)
         self.options.append(option)
+        return option
 
     def hide(self):
         for option in self.options:
@@ -57,10 +61,15 @@ class Option():
         pass
 
 
-class MoveOption(Option):
-    def __init__(self, name, destination=None, description=None):
+class Move(Option):
+    def __init__(self, name, destination=None, description=None, keep_rotation=True):
         Option.__init__(self, name, description=description)
         self.destination = destination
+        self.keep_rotation = keep_rotation
+        # keep_rotation: 
+        #	True = Keep the rotation from when you last exit this room
+        # 	False = Face the same direction as previous room
+        #	None = Rotate to first option
 
     def activate(self, activator):
         if self.destination:
@@ -70,47 +79,53 @@ class MoveOption(Option):
                 LerpFunctionInterval(base.camLens.set_fov, 0.2, fromData=base.camLens.get_fov()[0], toData=2, blendType='easeIn'),
                 Func(self.swap),
                 LerpFunctionInterval(base.camLens.set_fov, 0.2, fromData=base.camLens.get_fov()[0], toData=50, blendType='easeIn'),
-
             ).start()
 
     def swap(self):
         base.interface.room.node.detach_node()
-        self.destination.get_closest_selection(base.interface.room.rotation)
+        if self.keep_rotation == None:
+            self.parent.rotation = 0
+            self.parent.selection = 0
+        elif self.keep_rotation == False:
+            self.destination.get_closest_selection(base.interface.room.rotation)
         self.destination.update_mimic()
-
         base.interface.room = self.destination
         base.interface.current = base.interface.room
         base.interface.current.node.reparent_to(render)
 
            
-class ReturnOption(Option):
+class Return(Option):
     def __init__(self, name="return", description="You leave it."):
         Option.__init__(self, name, description=description)
     
     def activate(self, activator):
-        base.interface.current = self.parent.parent
+        self.deactivate()
         if self.description:
             base.interface.say(self.description)
         if self.function:
             self.function()
 
 
-class MenuOption(Option):
+class Menu(Option):
     def __init__(self, name):
         Option.__init__(self, name)
         self.selection = 0
         self.menu = self.node.attach_new_node("menu")
         self.time = 0
-        self.add(ReturnOption("nevermind"))
+        self.add(Return("nevermind"))
+
+    def realign(self):
+        for o, option in enumerate(self.options):
+            option.text.set_scale(0.6)
+            option.text.node().text_color = (0.2, 0.2, 0.2, 1)
+            option.node.set_z(-(1+o))
 
     def add(self, option):
         self.options.append(option)
-        option.text.set_scale(0.6)
-        option.text.node().text_color = (0.2, 0.2, 0.2, 1)
-        option.node.set_z(-len(self.options)/1.5)
         option.node.reparent_to(self.text)
         option.parent = self
         self.hide()
+        self.realign()
         return option
 
     def activate(self, activator):
@@ -154,21 +169,58 @@ class MenuOption(Option):
                 option.text.node().text_color = (0.2,0.2,0.2,1)
 
 
-class DoorOption(MenuOption):
+class Item(Menu):
+    def __init__(self, name, taken=False):
+        Menu.__init__(self, name)
+        self.taken = taken        
+        if not self.taken:
+            self.take_option = self.add(Option("take"))
+            self.take_option.function = self.take
+
+    def take(self, activated, activator):
+        base.interface.current = base.interface.room
+        self.parent.remove(self)
+        base.interface.inventory.add(self)
+        self.options.remove(self.take_option)
+        self.take_option.node.detach_node()
+        self.realign()
+
+
+class Use(Return):
+    def __init__(self, name, description="That doesn't work.", working_option=None, function=None):
+        Return.__init__(self, name, description)
+        self.working_option = working_option
+        self.function = function
+
+    def activate(self, activator):
+        if (self.working_option == None or 
+                self.working_option == base.interface.room.get_current()):
+            if self.function:
+                self.function(self, activator)
+            else:
+                base.interface.say(self.description)
+        else:
+            base.interface.say(self.description)
+        self.deactivate()
+        base.interface.inventory.deactivate()
+
+
+class Door(Menu):
     def __init__(self, destination, name="door", description="a boring old door", mimic=None):
         if mimic:
             name = mimic.name
             description = mimic.description
-        MenuOption.__init__(self, "closed "+name)
+        Menu.__init__(self, "closed "+name)
+        self.locked = None # Set this to "it's locked!" string to lock
         self.mimic = mimic
         self.name = name
         self.description = description
-        self.add(ReturnOption("look", description))
-        self.action = ReturnOption("open", "you take the handle...")
+        self.add(Return("look", description))
+        self.action = Return("open", "you take the handle...")
         self.action.function = self.open
         self.add(self.action)
         self.destination = destination
-        self.doption = MoveOption("enter", self.destination)
+        self.movement = Move("enter", self.destination, keep_rotation=False)
 
     def update_mimic(self): # This makes the other side open too in a very shitty way
         if self.mimic:
@@ -180,43 +232,60 @@ class DoorOption(MenuOption):
                     self.open(True)
 
     def open(self, quietly=False):
-        self.text.node().text = "open {}".format(self.name)
-        self.action.text.node().text = "close {}".format(self.name)
-        self.action.function = self.close
-        self.add(self.doption)
-        if not quietly:
-            base.interface.say("...and open the {}.".format(self.name))
+        if not self.locked:
+            self.text.node().text = "open {}".format(self.name)
+            self.action.text.node().text = "close {}".format(self.name)
+            self.action.function = self.close
+            self.add(self.movement)
+            if not quietly:
+                base.interface.say("...and open the {}.".format(self.name))
+        else:
+            base.interface.say(self.locked)
 
     def close(self, quietly=False):
         self.text.node().text = "closed {}".format(self.name)
         self.action.text.node().text = "open {}".format(self.name)
         self.action.function = self.open
-        self.doption.node.detach_node()
-        self.options.remove(self.doption)
+        self.movement.node.detach_node()
+        self.options.remove(self.movement)
         if not quietly:
             base.interface.say("...and close the {}.".format(self.name))
 
 
-class RolodexOption(Option):
+class Rolodex(Option):
     def __init__(self, name):
         Option.__init__(self, name)
         self.partition = 0
         self.selection = 0
         self.speed = 0.05
         self.rotation = 0
+    
+    def get_current(self):
+        return self.options[self.selection]
 
     def update_mimic(self):
         for option in self.options:
             option.update_mimic()
 
-    def add(self, option):
-        option.parent = self
-        self.options.append(option)
-        option.node.reparent_to(self.node)
+    def remove(self, option):
+        self.options.remove(option)
+        option.node.detach_node()
+        self.realign()
+        self.selection = 0
+        self.snap()
+
+    def realign(self):
         self.partition = 360*(1/(len(self.options)))
         for o, option in enumerate(self.options):
             option.node.set_h(-(o*self.partition))
             option.text.set_y(50)
+
+    def add(self, option):
+        option.parent = self
+        self.options.append(option)
+        option.node.reparent_to(self.node)
+        self.realign()
+        return option
 
     def rotate(self, move):
         speed = self.partition*self.speed
@@ -268,11 +337,15 @@ class RolodexOption(Option):
             self.select()
 
 
-class Inventory(RolodexOption):
+class Inventory(Rolodex):
     def __init__(self):
-        RolodexOption.__init__(self, "inventory")
+        Rolodex.__init__(self, "inventory")
         self.node.set_z(12)
         self.node.reparent_to(render)
+
+    def deactivate(self):
+        base.interface.current = base.interface.room
+        self.hide()
 
     def hide(self):
         self.node.hide()
