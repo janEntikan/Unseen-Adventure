@@ -47,7 +47,6 @@ def world():
     mountain_cabin = Rolodex("cabin")
     in_mountain_cabin = Rolodex("cabin")
     mines = Rolodex("the mines", "tension")
-
     #BEDROOM
     verb(bedroom, "bed", "It is not very soft.")
     bedroom_livingroom_door = bedroom.add(Door(
@@ -92,9 +91,9 @@ def world():
     livingroom_chair.add(Return("feel", "your trusty chair"))
     livingroom_chair.add(Return("sit", "You sit down for a few, and stand up again."))
     livingroom.add(Door(destination=bedroom, name="door", mimic=bedroom_livingroom_door))
-    livingroom_bookcase = livingroom.add(Menu("bookcase"))
-    livingroom_bookcase.add(Return("look", "All the books you've ever read."))
-    livingroom_bookcase.add(Return("read", "you've read all of these already."))
+    livingroom_bookcase = livingroom.add(Menu("piano"))
+    livingroom_bookcase.add(Return("feel", "The keys are nice and weighty."))
+    livingroom_bookcase.add(Return("listen", "E3 is a little flat. Could use another tune up."))
     # GARDEN
     verb(garden, "flowerbed", "they smell so good", verb="smell")
     garden.add(Door(destination=livingroom, name="front door", mimic=front_door))
@@ -107,9 +106,9 @@ def world():
     make_open_door(neighbour, tover_house, "front door")
     verb(neighbour, "small tree", "a very dry old pine tree.")
     tover_house.add(NPC("miss tover", [
-        "Hello young man. Can I get you anything?",
-        "I haven't left the city in over 30 years.",
-        "How are things outside of the city?",
+        "Ah it's you. Can do anything for you?",
+        "I haven't stepped outside this town in over 30 years.",
+        "Did you ever leave the city?",
         "My son David works in the mines.",
     ]))
     # TOWN CENTER
