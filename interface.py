@@ -1,7 +1,7 @@
 from panda3d.core import TextNode
 
 from options import *
-from scene1 import scene1
+from chapter1 import chapter1
 
 
 class Interface():
@@ -14,18 +14,10 @@ class Interface():
         self.output.set_z(-0.75)
         self.to_output = ["","","", ""]
         self.inventory = Inventory()
-        self.say("press i for inventory")
-
-        # Some debug items:
-        lint = Menu("pocket lint")
-        lint.add(Return("look", "that stuff at the bottom of your pocket"))
-        self.inventory.add(lint)
-        hamburger = Menu("hamburger")
-        hamburger.add(Return("look", "a delicious looking hamburger"))
-        hamburger.add(Return("eat", "you are not hungry right now"))
-        self.inventory.add(hamburger)
+        self.money = self.inventory.add(Money(10, True))
         self.inventory.hide()
-        self.room = scene1()  
+        self.say("press i for inventory")
+        self.room = chapter1()  
         self.current = self.room
 
     def say(self, output_string):
@@ -47,6 +39,8 @@ class Interface():
                 self.inventory.hide()
                 self.current = self.room
             else:
+                if not self.room == self.current:
+                    self.current.deactivate()
                 base.sounds["back"].play()
                 self.inventory.show()
                 self.current = self.inventory
