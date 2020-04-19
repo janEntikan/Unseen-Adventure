@@ -189,7 +189,10 @@ class Money(Item):
     def __init__(self, quantity, taken=False):
         Item.__init__(self, "gold", taken=taken)
         self.quantity = quantity
-        self.add(Return("count", str(self.quantity)+" gold pieces"))
+        self.add(Return("count", "You count the gold.")).function=self.say_quantity
+
+    def say_quantity(self):
+        base.interface.say("There are "+str(self.quantity)+" gold pieces")
 
     def add_to_inventory(self):
         base.interface.money.quantity += self.quantity

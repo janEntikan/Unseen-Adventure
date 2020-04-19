@@ -57,14 +57,14 @@ def world():
         description ="The wooden closet holding your wardrobe."))
         # CLOSET
     closet.add(Door(destination=bedroom, mimic=bedroom_closet_door))
-    closet.add(Item("plain clothes", "made from very cheap cloth"))
+    closet.add(Item("plain clothes", "obviously made from very cheap cloth"))
         # DESK
-    desk = Rolodex("writing desk")
-    bedroom.add(Move("writing desk", desk, "you inspect the writing desk."))
-    verb(desk, "quill", "There's no ink to write with")
-    verb(desk, "paper", "There's no ink on them")
-    verb(desk, "paperweight", "It's useless.")
-    desk.add(Nevermind(bedroom, "You stop touching the writing desk."))
+    desk = Rolodex("work bench")
+    bedroom.add(Move("work bench", desk, "you inspect the bench."))
+    desk.add(Money(150))
+    verb(desk, "broken watch",  "you were supposed to fix this a long time ago")
+    verb(desk, "jeweler tools",  "tools of your trade...once upon a time")
+    desk.add(Nevermind(bedroom, "You stop inspecting the bench."))
     # LIVINGROOM
     verb(livingroom, "window", "you bathe in the sun's warmth")
     front_door = livingroom.add(Door(garden, "front door"))
@@ -72,8 +72,8 @@ def world():
         # WALL HOOKS
     hooks = Rolodex("wall hooks", explored=True)
     livingroom.add(Move("wall hooks", hooks, "you inspect the wall hooks."))
-    hat = hooks.add(Item("hat")).add(Return("feel", "a stitson hat."))
-    verb(hooks, "wet spot", "there's a wet spot on the wall here")
+    hat = hooks.add(Item("hat")).add(Return("feel", "your old tricorne hat."))
+    verb(hooks, "wet spot", "a broken rainpipe will do that to you")
     hooks.add(Nevermind(livingroom, "You stop inspecting the wall hooks."))
         # FRONT DOOR AND KEY
     def unlock_front_door(activated, activator):
@@ -88,12 +88,12 @@ def world():
         "use", "That doesn't work.", 
         front_door, unlock_front_door))
     livingroom_chair = livingroom.add(Menu("chair"))
-    livingroom_chair.add(Return("feel", "your trusty chair"))
+    livingroom_chair.add(Return("feel", "A good balance between softness and support"))
     livingroom_chair.add(Return("sit", "You sit down for a few, and stand up again."))
     livingroom.add(Door(destination=bedroom, name="door", mimic=bedroom_livingroom_door))
     livingroom_bookcase = livingroom.add(Menu("piano"))
-    livingroom_bookcase.add(Return("feel", "The keys are nice and weighty."))
     livingroom_bookcase.add(Return("listen", "E3 is a little flat. Could use another tune up."))
+    livingroom_bookcase.add(Return("feel", "The keys are nice and weighty."))
     # GARDEN
     verb(garden, "flowerbed", "they smell so good", verb="smell")
     garden.add(Door(destination=livingroom, name="front door", mimic=front_door))
@@ -261,8 +261,8 @@ def world():
     # CANDY HOUSE
     make_path(clearing, candy_house)
     verb(candy_house, "candy mailbox", "it tastes like candy", verb="taste")
-    verb(candy_house, "candy house", "A house made of candy. You don't taste an entrance.", verb="taste")
-    verb(candy_house, "candy fence", "a picket fence made of candy", verb="taste")
+    verb(candy_house, "candy house", "A house made of candy but you don't taste an entrance.", verb="taste")
+    verb(candy_house, "candy fence", "a picket fence made of...candy", verb="taste")
     # WATERFALL
     #make_path(waterfall, cave) # TODO: Cave is behind the waterfall
     verb(waterfall, "puddle", "you go splish splash", verb="splash")
