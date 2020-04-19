@@ -3,7 +3,7 @@ from battle import Mob
 from npc import NPC
 
 def world():
-    bedroom = Rolodex("bedroom", "home")
+    start_room = bedroom = Rolodex("bedroom", "home")
     closet = Rolodex("closet", "home")
     hallway = Rolodex("hallway", "home")
     livingroom = Rolodex("livingroom", "home")
@@ -21,7 +21,7 @@ def world():
     castle_gate = Rolodex("castle gate", "town")
     bank = Rolodex("bank", "shop")
     castle = Rolodex("castle","tension")
-    start_room = town_bridge = Rolodex("town bridge", "forrest")
+    town_bridge = Rolodex("town bridge", "forrest")
     crossroads = Rolodex("crossroads", "forrest")
     long_road = Rolodex("long road", "forrest")
     dunes = Rolodex("dunes", "forrest")
