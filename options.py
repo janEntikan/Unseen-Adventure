@@ -32,6 +32,9 @@ class Option():
     def init(self):
         pass
 
+    def is_known(self):
+        pass
+
     def deactivate(self):
         base.interface.current = self.parent.parent
 
@@ -186,7 +189,7 @@ class Money(Item):
     def __init__(self, quantity, taken=False):
         Item.__init__(self, "gold", taken=taken)
         self.quantity = quantity
-        self.add(Return("look", str(self.quantity)+" gold pieces"))
+        self.add(Return("count", str(self.quantity)+" gold pieces"))
 
     def add_to_inventory(self):
         base.interface.money.quantity += self.quantity
@@ -195,6 +198,7 @@ class Money(Item):
 class Move(Option):
     def __init__(self, name, destination=None, description=None, keep_rotation=True, mimic=None):
         Option.__init__(self, name, description=description)
+        self.name = name
         self.destination = destination
         self.keep_rotation = keep_rotation
         self.mimic = mimic
@@ -204,6 +208,12 @@ class Move(Option):
         #	True = Keep the rotation from when you last exit this room
         # 	False = Face the same direction as previous room
         #	None = Rotate to first option
+
+    def is_known(self):
+        if self.destination.explored:
+            self.text.node().text = self.name
+        else:
+            self.text.node().text = "?"
 
     def go(self):
         if self.destination:
@@ -241,8 +251,11 @@ class Move(Option):
         if self.destination.song:
             base.play_music(self.destination.song)
         base.interface.location.node().text = self.destination.node.name
+        self.destination.explored = True
         self.destination.snap()
         self.destination.update_mimic()
+        for option in self.destination.options:
+            option.is_known()
         base.interface.room = self.destination
         base.interface.current = base.interface.room
         base.interface.current.node.reparent_to(render)
@@ -287,7 +300,7 @@ class Door(Menu):
         self.locked = None # Set this to "it's locked!" string to lock
         self.name = name
         self.description = description
-        self.add(Return("look", description))
+        self.add(Return("feel", description))
         self.action = Return("open", "you take the handle...")
         self.action.function = self.open
         self.add(self.action)
@@ -327,7 +340,7 @@ class Door(Menu):
 
 
 class Rolodex(Option):
-    def __init__(self, name, song=None):
+    def __init__(self, name, song=None, explored=False):
         Option.__init__(self, name)
         self.partition = 0
         self.selection = 0
@@ -335,7 +348,8 @@ class Rolodex(Option):
         self.rotation = 0
         self.rotating = False
         self.song = song
-    
+        self.explored = explored
+
     def get_current(self):
         return self.options[self.selection]
 
@@ -446,13 +460,12 @@ def make_path(a, b):
     m = a.add(Move("to "+b.node.name, b, keep_rotation=False))
     b.add(Move("to "+a.node.name, a, keep_rotation=False, mimic=m))
 
-
 def make_open_door(a, b, name, description="a regular wooden door"):
     door = a.add(Door(name=name, destination=b, description=description))
     b.add(Door(destination=a, name=name, mimic=door))
     return door
 
-def looker(location, name, description, verb="feel"):
+def verb(location, name, description, verb="feel"):
     option = location.add(Menu(name))
     option.add(Return(verb, description))
     return option
