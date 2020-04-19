@@ -58,25 +58,24 @@ def world():
         description ="The dark oak closet holding your wardrobe."))
         # CLOSET
     closet.add(Door(destination=bedroom, mimic=bedroom_closet_door))
-    closet.add(Item("plain clothes", "very boring looking clothes"))
+    closet.add(Item("plain clothes", "made from very cheap cloth"))
         # DESK
     desk = Rolodex("writing desk")
     bedroom.add(Move("writing desk", desk, "you inspect the writing desk."))
-    looker(desk, "quill", "There's no ink")
+    looker(desk, "quill", "There's no ink to write with")
     looker(desk, "paper", "There's no ink on them")
     looker(desk, "paperweight", "It's useless.")
-    desk.add(Nevermind(bedroom, "You stop looking at the writing desk."))
+    desk.add(Nevermind(bedroom, "You stop touching the writing desk."))
     # LIVINGROOM
-    looker(livingroom, "window", "it's a beautiful day outside")
+    looker(livingroom, "window", "you bathe in the sun's warmth")
     front_door = livingroom.add(Door(garden, "front door"))
     front_door.locked = "It won't open. It's locked."
         # WALL HOOKS
     hooks = Rolodex("wall hooks")
     livingroom.add(Move("wall hooks", hooks, "you inspect the wall hooks."))
-    hat = hooks.add(Item("hat"))
-    hat.add(Return("look", "a brown stitson hat."))
-    looker(hooks, "stain", "there's a brown stain on the wall")
-    hooks.add(Nevermind(livingroom, "You stop looking at the wall hooks."))
+    hat = hooks.add(Item("hat")).add(Return("feel", "a stitson hat."))
+    looker(hooks, "wet spot", "there's a wet spot on the wall here")
+    hooks.add(Nevermind(livingroom, "You stop inspecting the wall hooks."))
         # FRONT DOOR AND KEY
     def unlock_front_door(activated, activator):
         if front_door.locked:
@@ -85,7 +84,7 @@ def world():
         else:
             base.interface.say("It's already unlocked.")
     key = hooks.add(Item("key"))
-    key.add(Return("look", "It's a bit rusty."))
+    key.add(Return("feel", "It's a bit rusty."))
     key.add(Use(
         "use", "That doesn't work.", 
         front_door, unlock_front_door))
@@ -97,16 +96,16 @@ def world():
     livingroom_bookcase.add(Return("look", "All the books you've ever read."))
     livingroom_bookcase.add(Return("read", "you've read all of these already."))
     # GARDEN
-    looker(garden, "flowerbed", "vibrant and colorful flowers")
+    looker(garden, "flowerbed", "they smell so good", verb="smell")
     garden.add(Door(destination=livingroom, name="front door", mimic=front_door))
-    looker(garden, "shrub", "a deep green shrubbery")
+    looker(garden, "shrub", "a fresh smelling shrubbery", verb="smell")
     make_path(road, garden)
     make_path(town_bridge, road)   
     make_path(road, neighbour)
     # MISS TOVER
     looker(neighbour, "flowers", "Miss Tover likes flowers almost as much as you do")
     make_open_door(neighbour, tover_house, "front door")
-    looker(neighbour, "small tree", "A regular old pine tree.")
+    looker(neighbour, "small tree", "a very dry old pine tree.")
     tover_house.add(NPC("miss tover", [
         "Hello young man. Can I get you anything?",
         "I haven't left the city in over 30 years.",
@@ -117,7 +116,7 @@ def world():
     make_open_door(town_center, bakery, "bakery door")
     bakery.add(NPC("baker", [
         "Good day, friend. What will it be?",
-        "Take a look around!",
+        "Take a look...euh smell around!",
         "I start baking at 4AM.",
         "Don't you just love the smell of bread?",
     ]))
@@ -129,7 +128,7 @@ def world():
         "Bending steel is hard work.",
         "We have a special offer on wooden swords today.",
     ]))
-    looker(town_center, "well", "the town's water supply.")
+    looker(town_center, "well", "dank stones. the town's water supply.")
     make_path(town_center, alley)
     make_open_door(town_center, inn, "inn door")
     inn.add(NPC("innkeeper", [
@@ -142,15 +141,15 @@ def world():
     magicshop.add(NPC("magician", [
         "Spells and curses for sale.",
         "Careful, that's very unstable!",
-        "I can tell you have a good eye for magic.",
+        "I can tell you have a good ear for magic.",
         "Magic, ladies and gentlemen.",
     ]))
     make_open_door(town_center, training, "trainer door")
     training.add(NPC("trainer", [
         "Need some training?",
-        "That's the ticket!",
-        "Feel the burn.",
-        "Are you pumped for the day?",
+        "Just walk up to the equipment!",
+        "Don't you want to feel the burn?",
+        "Are you pumped yet?",
     ]))
     # CASTLE
     make_open_door(castle_gate, bank, "banker door") 
@@ -168,48 +167,48 @@ def world():
         "What makes you think you can just barge in here?",
     ]))
     # BRIDGE
-    looker(town_bridge, "river", "the river flows under the bridge")
+    looker(town_bridge, "river", "the river flows under the bridge", verb="listen")
     make_path(town_bridge, crossroads)
-    looker(town_bridge, "river", "the river flows under the bridge")
+    looker(town_bridge, "river", "the river flows under the bridge", verb="listen")
     # CROSSROADS
     make_path(crossroads, forrest_path)
     make_path(crossroads, long_road)
     make_path(crossroads, mountain_path)
     make_path(long_road, forrest_cabin)
     make_path(long_road, dunes)
-    looker(long_road, "street lantern", "provides illumination at night")
+    looker(long_road, "street lantern", "should provide illumination at night, not that you need it")
     # SEA DIRECTION
-    looker(dunes, "seashell", "a colorfull seashell lies on the floor")
+    looker(dunes, "seashell", "it emulates the ocean sound", verb="listen")
     make_path(dunes, sea)
-    looker(dunes, "grass patch", "a patch of grass surrounded by white sand")
+    looker(dunes, "grass patch", "a patch of grass surrounded by warm sand")
     # SEA
     looker(sea, "seaweed", "a bit of seaweed washed ashore")
-    looker(sea, "sea", "bright blue water stretches out before you")
-    looker(sea, "seagul", "a seagul sits on a wooden pole")
+    looker(sea, "sea", "you hear crashing ocean waves", verb="listen")
+    looker(sea, "seagul", "a seagul squeeks at you", verb="listen")
     # HARBOR
     make_path(dunes, harbor)
-    looker(harbor, "the harbor", "Fishermen and boats galore! All ashore!")
+    looker(harbor, "the harbor", "You smell a lot of fish! All ashore!", verb="listen")
     # MOUNTAIN DIRECTION
-    looker(mountain_path, "canyon view", "A steep mile-deep canyon leads downwards into the dark.")
+    looker(mountain_path, "canyon view", "You throw a pebble. Long way down.", verb="listen")
     make_path(mountain_path, canyon_path)
-    looker(mountain_path, "clif face", "an unclimbable dense clif face")
+    looker(mountain_path, "cliff face", "an vertical, cold cliff face")
     looker(canyon_path, "stack of rocks", "someone has stacked some rocks on top of eachother")
     make_path(canyon_path, mountain_cabin)
     make_open_door(mountain_cabin, in_mountain_cabin, "cabin door")
     looker(in_mountain_cabin, "broken table", "this table is missing two legs")
     looker(in_mountain_cabin, "hole in floor", "the hole exposes a crack in the foundation")
-    looker(in_mountain_cabin, "torn wallpaper", "dirty brown flower wallpaper with a tear in it")
+    looker(in_mountain_cabin, "torn wallpaper", "there's a tear in the wallpaper here")
     make_path(canyon_path, mines)
     mines.add(NPC("miner", [
         "Sorry, but this mine is off limits."
     ]))
     # FORREST DIRECTION
     looker(forrest_path, "big tree", 
-        "a majestic tree points to the sky")   
+        "you can't quite put your arms around it")
     make_path(forrest_path, lake)
     looker(forrest_path, "bench", "A park bench for the resting of tired legs.")
     # FORREST CABIN
-    looker(forrest_cabin, "birdhouse", "One of those wooden birdhouses. It's empty.")
+    looker(forrest_cabin, "birdhouse", "No birds.", verb="listen")
     make_path(forrest_path, forrest_cabin)
     make_open_door(forrest_cabin, in_forrest_cabin, "cabin door")
     looker(in_forrest_cabin, "dresser", "probably contains the old man's clothes")
@@ -224,19 +223,19 @@ def world():
     looker(in_forrest_cabin, "bunk bed", "three beds stacked on top of eachother.")
     # LAKE
     make_path(lake, river)
-    looker(lake, "lake", "the water ripples play with the sun's light rays.")
+    looker(lake, "lake", "the water is very cold, but not deep.")
     make_path(lake, forrest)
-    looker(lake, "walnut tree", "a tree carrying wallnuts.")
+    looker(lake, "walnut tree", "The fruit feel like wallnuts.")
     make_path(lake, tower)
-    looker(lake, "berry bush", "better leave them alone, might be poisonous.")
+    looker(lake, "berry bush", "better leave them alone, might be poisonous.", verb="taste")
     make_path(forrest, deep_forrest)
     # WIZARD TOWER
-    tower_door = looker(tower, "tower entrance", "a large stone door")
+    tower_door = looker(tower, "tower entrance", "the seams betrays a large stone door")
     tower_door.add(Return("open", "it is magically sealed"))
     # LIGHT FORREST
     looker(forrest, "tree", "Not quite sure what kind of tree this is.")
     make_path(forrest, candy_house)
-    looker(forrest, "mushrooms", "a small group of mushrooms in a circle")
+    looker(forrest, "mushrooms", "a small group of mushrooms")
     make_path(forrest, waterfall) 
     looker(forrest, "boulder", "a decently sized boulder sticking out of the dirt")
     looker(river, "river", "Riverrun, past Eve and Adam's, from swerve of shore to bend of bay")
@@ -251,18 +250,18 @@ def world():
     looker(deep_forrest, "foliage", "a cluster of trees and shrubs")
     # STRANGE ROCK
     make_path(clearing, strange_rock)
-    looker(strange_rock, "strange rock", "An enormous strange, vibrating, translucent blue stone")
+    looker(strange_rock, "strange rock", "An enormous strange, vibrating stone")
     # BONFIRE
     make_path(clearing, bonfire)
     looker(bonfire, "bonfire", "there's a fire here, someone must have been here only recently")
     # CANDY HOUSE
     make_path(clearing, candy_house)
-    looker(candy_house, "candy mailbox", "it's empty")
-    looker(candy_house, "candy house", "A house made of candy. You don't see an entrance.")
-    looker(candy_house, "candy fence", "a picket fence made of candy")
+    looker(candy_house, "candy mailbox", "it tastes like candy", verb="taste")
+    looker(candy_house, "candy house", "A house made of candy. You don't taste an entrance.", verb="taste")
+    looker(candy_house, "candy fence", "a picket fence made of candy", verb="taste")
     # WATERFALL
     #make_path(waterfall, cave) # TODO: Cave is behind the waterfall
-    looker(waterfall, "waterbed", "a rainbow bends from here to the waterfall, sparkles")
-    looker(waterfall, "waterfall", "a rainbow bends from here to the waterbed, sparkles")
-    looker(waterfall, "wet boulder", "a bit of water from the waterfall lands on this boulder")
+    looker(waterfall, "puddle", "you go splish splash", verb="splash")
+    looker(waterfall, "waterfall", "A fog of water tickles your face. sparkles!")
+    looker(waterfall, "wet boulder", "water from the waterfall moistens this boulder")
     return start_room

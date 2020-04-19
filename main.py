@@ -47,7 +47,8 @@ class GameApp(ShowBase):
             "accept", "back", "error", 
             "rotate", "select", "move",
             "hit0", "hit1", "hit2", "hit3",
-            "down", "upup",
+            "down", "upup", 
+            "door_open", "door_close",
         )
         musics = (
             "home", "town", "shop", "tension",
@@ -57,6 +58,7 @@ class GameApp(ShowBase):
             self.sounds[sound] = loader.load_sfx("sound/{}.wav".format(sound))
         for music in musics:
             self.music[music] = loader.load_sfx("music/{}.wav".format(music))
+            self.music[music].set_volume(0.25)
 
     def play_music(self, music=None):
         if not music == self.playing:

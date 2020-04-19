@@ -207,6 +207,7 @@ class Move(Option):
 
     def go(self):
         if self.destination:
+            base.sounds["move"].play()
             if self.description:
                 base.interface.say(self.description)
             base.start_sequence(
@@ -309,6 +310,7 @@ class Door(Menu):
             self.action.function = self.close
             self.add(self.movement)
             if not quietly:
+                base.sounds["door_open"].play()
                 base.interface.say("...and open the {}.".format(self.name))
         else:
             base.interface.say(self.locked)
@@ -320,6 +322,7 @@ class Door(Menu):
         self.movement.node.detach_node()
         self.options.remove(self.movement)
         if not quietly:
+            base.sounds["door_closed"].play()
             base.interface.say("...and close the {}.".format(self.name))
 
 
@@ -449,7 +452,7 @@ def make_open_door(a, b, name, description="a regular wooden door"):
     b.add(Door(destination=a, name=name, mimic=door))
     return door
 
-def looker(location, name, description):
+def looker(location, name, description, verb="feel"):
     option = location.add(Menu(name))
-    option.add(Return("look", description))
+    option.add(Return(verb, description))
     return option
