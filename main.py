@@ -24,7 +24,7 @@ class GameApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         pman.shim.init(self)
-        self.win.set_clear_color((0,0,0,1))
+        self.win.set_clear_color((0.03,0.03,0.03,1))
         self.accept('escape', sys.exit)
         add_device_listener(
             config_file='keybindings.toml',
