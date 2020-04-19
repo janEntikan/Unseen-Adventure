@@ -239,6 +239,7 @@ class Move(Option):
         self.rotate()
         if self.destination.song:
             base.play_music(self.destination.song)
+        base.interface.location.node().text = self.destination.node.name
         self.destination.snap()
         self.destination.update_mimic()
         base.interface.room = self.destination
@@ -449,4 +450,6 @@ def make_open_door(a, b, name, description="a regular wooden door"):
     return door
 
 def looker(location, name, description):
-    location.add(Menu(name)).add(Return("look", description))
+    option = location.add(Menu(name))
+    option.add(Return("look", description))
+    return option

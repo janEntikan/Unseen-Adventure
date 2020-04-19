@@ -35,12 +35,12 @@ class GameApp(ShowBase):
         self.font = loader.load_font("probe.ttf")
         self.load_sounds()
         self.interface = Interface()
-        self.playing = None
         self.sequence = None
         self.sequence_end = Func(self.end_sequence)
         taskMgr.add(self.update)
 
     def load_sounds(self):
+        self.playing = None
         self.sounds = {}
         self.music = {}
         sounds = (

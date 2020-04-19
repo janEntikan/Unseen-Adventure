@@ -1,7 +1,7 @@
 from panda3d.core import TextNode
 
 from options import *
-from chapter1 import chapter1
+from world import world
 
 
 class Interface():
@@ -17,9 +17,18 @@ class Interface():
         self.money = self.inventory.add(Money(10, True))
         self.inventory.hide()
         self.say("press i for inventory")
-        self.room = chapter1()  
+        self.room = world()  
+        self.room.node.reparent_to(render)
+        base.play_music(self.room.song)
         self.current = self.room
 
+        self.location = render2d.attach_new_node(TextNode("location text"))
+        self.location.node().text = self.room.node.name
+        self.location.node().align = 2
+        self.location.node().font = base.font
+        self.location.set_scale(0.025, 0.025, 0.045)
+        self.location.set_z(0.1)
+        
     def say(self, output_string):
         self.to_output.append(output_string)
         while len(self.to_output) > 4:
