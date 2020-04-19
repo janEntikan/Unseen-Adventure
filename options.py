@@ -141,16 +141,17 @@ class Menu(Option):
     def update(self, context):
         self.options[self.selection]
         self.time -= base.dt
-        if context["select"]:
+        ud = round(context["ud_a"] + context["ud_b"])
+        if context["select_a"] or context["select_b"]:
             self.select()   
-        elif not context["ud"]:
+        elif not ud:
             self.time = 0
         elif self.time <= 0:
             self.time = 0.2
-            if context["ud"] > 0:
+            if ud > 0:
                 self.selection += 1
                 base.sounds["select"].play()
-            elif context["ud"] < 0:
+            elif ud < 0:
                 self.selection -= 1
                 base.sounds["select"].play()
             if self.selection < 0:
@@ -433,9 +434,9 @@ class Rolodex(Option):
         self.options[self.selection].activate(self)
 
     def update(self, context):
-        self.rotate(context["lr"])      
+        self.rotate(context["lr_a"]+context["lr_b"])      
         self.node.set_h(self.rotation)
-        if context["select"]:
+        if context["select_a"] or context["select_b"]:
             self.select()
 
 

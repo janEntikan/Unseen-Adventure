@@ -59,7 +59,7 @@ def world():
     closet.add(Door(destination=bedroom, mimic=bedroom_closet_door))
     closet.add(Item("plain clothes", "obviously made from very cheap cloth"))
         # DESK
-    desk = Rolodex("work bench")
+    desk = Rolodex("work bench", explored=True)
     bedroom.add(Move("work bench", desk, "you inspect the bench."))
     desk.add(Money(150))
     verb(desk, "broken watch",  "you were supposed to fix this a long time ago")

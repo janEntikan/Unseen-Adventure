@@ -1,32 +1,40 @@
 [ta]
-  [ta.lr]
+  [ta.lr_a]
   _type = "axis"
   _device_order = ["gamepad", "keyboard"]
   gamepad = "left_x"
   keyboard = "arrow_right,arrow_left"
 
-  [ta.ud]
+  [ta.lr_b]
+  _type = "axis"
+  _device_order = ["keyboard"]
+  keyboard = "d,a"
+
+  [ta.ud_a]
   _type = "axis"
   _device_order = ["gamepad", "keyboard"]
   gamepad = "left_y"
   keyboard = "arrow_up,arrow_down"
 
-  [ta.select]
+  [ta.ud_b]
+  _type = "axis"
+  _device_order = ["keyboard"]
+  keyboard = "w,s"
+
+  [ta.select_a]
   _type = "trigger"
   _device_order = ["gamepad", "keyboard"]
   gamepad = "face_x"
   keyboard = "enter"
+
+  [ta.select_b]
+  _type = "trigger"
+  _device_order = ["gamepad", "keyboard"]
+  gamepad = "face_x"
+  keyboard = "space"
 
   [ta.inventory]
   _type = "trigger"
   _device_order = ["gamepad", "keyboard"]
   gamepad = "face_y"
   keyboard = "i"
-
-  [ta.equipment]
-  _type = "trigger"
-  _device_order = ["gamepad", "keyboard"]
-  gamepad = "face_a"
-  keyboard = "e"
-
-
