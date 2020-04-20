@@ -17,6 +17,7 @@ class Interface():
         self.money = self.inventory.add(Money(10, True))
         self.inventory.hide()
         self.say("press i for inventory")
+        self.say("press c to check yourself")
         self.room = world()  
         self.room.node.reparent_to(render)
         base.play_music(self.room.song)
@@ -29,12 +30,24 @@ class Interface():
         self.location.set_scale(0.025, 0.025, 0.045)
         self.location.set_z(0.1)
 
-        self.equipment = {
-            "armor":None,
-            "weapon":None,
-            "helmet":None,
-            "necklace":None,
-        }
+        self.hp = 10
+        self.status = "normal"
+        self.level = 1
+        self.xp = 0
+        self.equipment = {}
+        self.creature_codex = []
+
+        self.character = Inventory()
+        self.character.hide()
+        def get_health(a,b): return base.interface.say("You have {} hp.".format(self.hp))
+        def get_status(a,b): return base.interface.say("Your status is {}.".format(self.status))
+        def get_level(a,b): return base.interface.say("Your level is {}.".format(self.level))
+        def get_xp(a,b): return base.interface.say("You have {} xp.".format(self.xp))
+        self.character.add(Option("health")).function=get_health
+        self.character.add(Option("status")).function=get_status
+        self.character.add(Option("level")).function=get_level
+        self.character.add(Option("experience")).function=get_xp
+
         
     def say(self, output_string):
         self.to_output.append(output_string)
@@ -49,7 +62,7 @@ class Interface():
 
     def update(self):
         context = base.device_listener.read_context('ta')
-        if context["inventory"]:
+        if context["inventory"] and not self.current == self.character:
             if self.current == self.inventory:
                 base.sounds["back"].play()
                 self.inventory.hide()
@@ -60,5 +73,14 @@ class Interface():
                 base.sounds["back"].play()
                 self.inventory.show()
                 self.current = self.inventory
+        if context["character"] and not self.current == self.inventory:
+            if not self.current == self.character:
+                base.sounds["back"].play()
+                self.current = self.character
+                self.character.show()
+            else:
+                base.sounds["back"].play()
+                self.character.hide()
+                self.current = self.room
 
         self.current.update(context)

@@ -38,3 +38,9 @@
   _device_order = ["gamepad", "keyboard"]
   gamepad = "face_y"
   keyboard = "i"
+
+  [ta.character]
+  _type = "trigger"
+  _device_order = ["gamepad", "keyboard"]
+  gamepad = "face_a"
+  keyboard = "c"

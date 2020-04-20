@@ -11,6 +11,7 @@ def world():
     neighbour = Rolodex("miss tover's house", "home", True)
     tover_house = Rolodex("tover house", "home")
     inn = Rolodex("inn", "shop")
+    inn_seat = Rolodex("seat", "shop")
     alley = Rolodex("alley", "tension")
     town_center = Rolodex("town square", "town", True)
     bakery = Rolodex("bakery", "shop")
@@ -60,8 +61,8 @@ def world():
         # DESK
     desk = Rolodex("work bench", explored=True)
     bedroom.add(Move("work bench", desk, "you inspect the bench."))
-    desk.add(Money(150))
     verb(desk, "broken watch",  "you were supposed to fix this a long time ago")
+    desk.add(Money(150))
     verb(desk, "jeweler tools",  "tools of your trade...once upon a time")
     desk.add(Nevermind(bedroom, "You stop inspecting the bench."))
     # LIVINGROOM
@@ -99,6 +100,7 @@ def world():
     make_path(road, garden)
     make_path(town_bridge, road)   
     make_path(road, neighbour)
+    make_path(town_center, road)
     # MISS TOVER
     verb(neighbour, "flowers", "Miss Tover likes flowers almost as much as you do")
     make_open_door(neighbour, tover_house, "front door")
@@ -110,14 +112,20 @@ def world():
         "My son David works in the mines.",
     ]))
     # TOWN CENTER
+        #BAKERY
     make_open_door(town_center, bakery, "bakery door")
+    bakery.add(Item("oven", cost=50000)) 
+    bakery.add(Item("flour", cost=50)) 
+    bakery.add(Item("yeast", cost=50)) 
     bakery.add(NPC("baker", [
         "Good day, friend. What will it be?",
         "Take a look...euh smell around!",
         "I start baking at 4AM.",
         "Don't you just love the smell of bread?",
     ]))
-    make_path(town_center, road)
+    bakery.add(Item("baguette", cost=250)) 
+    bakery.add(Item("broodje", cost=250)) 
+    bakery.add(Item("bretzel", cost=250)) 
         # ARMORY
     make_open_door(town_center, armory, "armory door")
     armory.add(Equipment("wooden sword", "weapon", 50, 2, 0))
@@ -133,22 +141,35 @@ def world():
     armory.add(Equipment("chain armor", "armor", 1000, 0, 10))
     armory.add(Equipment("plate armor", "armor", 2500, 0, 25))
     verb(town_center, "well", "dank stones. the town's water supply.")
+        # ALLEY
     make_path(town_center, alley)
     alley.add(NPC("thug", [
         "what the hell are you staring at!?",
         "get the hell out of my face, boy.",
         "you're getting on my nerves.",
     ]))
+        # INN
     make_open_door(town_center, inn, "inn door")
+            # seat
+    verb(inn_seat, "menu", "A flat foldable square.", verb="feel")
+    verb(inn_seat, "table", "You drum a little rythm.", verb="drum")
+    verb(inn_seat, "candle", "It's sitting on a sturdy candle holder.")
+            # chairs
+    inn.add(Move("seat", inn_seat, "you take a seat"))
+    inn.add(Move("seat", inn_seat, "you take a seat"))
+    inn.add(Move("seat", inn_seat, "you take a seat"))
+    inn_seat.add(Move("stand back up", inn, "you stand up again"))
     inn.add(NPC("innkeeper", [
         "Come in! Have a seat!",
         "What can I get you?",
         "A room is 25 gold a night.",
         "This mead comes all the way from Albaden.",
     ]))
+    inn.add(Move("seat", inn_seat, "you take a seat")) 
+    inn.add(Move("seat", inn_seat, "you take a seat")) 
+    inn.add(Move("seat", inn_seat, "you take a seat")) 
     # MAGIC SHOP
-    make_open_door(town_center, magicshop, "magicshop door")
-    
+    make_open_door(town_center, magicshop, "magicshop door")  
     magicshop.add(Item("red potion", cost=50))
     magicshop.add(Item("green potion", cost=50))
     magicshop.add(Item("blue potion", cost=50))
@@ -161,7 +182,7 @@ def world():
     magicshop.add(Equipment("blue pendant", "necklace", cost=500))
     magicshop.add(Equipment("green pendant", "necklace", cost=500))
     magicshop.add(Equipment("red pendant", "necklace", cost=500))
-
+    # TRAINER
     make_open_door(town_center, training, "trainer door")
     training.add(NPC("trainer", [
         "Need some training?",
@@ -194,14 +215,34 @@ def world():
     make_path(crossroads, mountain_path)
     make_path(long_road, forrest_cabin)
     make_path(long_road, dunes)
-    verb(long_road, "street lantern", "should provide illumination at night, not that you need it")
+    verb(long_road, "street lantern", "provides illumination to those who need it")
     # SEA DIRECTION
     verb(dunes, "seashell", "it emulates the ocean sound", verb="listen")
+
+    crab = dunes.add(Mob(
+        "giant crab", 
+        "it makes a click-clacking noise, almost like...a giant crab!", 
+        "a pile of claws and shells"
+    ))
+    crab.hp = 5
+    crab.ap = 5
+    crab.attack = 2
+    crab.sensitivity = "blue"
+
     make_path(dunes, sea)
     verb(dunes, "grass patch", "a patch of grass surrounded by warm sand")
     # SEA
     verb(sea, "seaweed", "a bit of seaweed washed ashore")
     verb(sea, "sea", "you hear crashing ocean waves", verb="listen")
+    crab = sea.add(Mob(
+        "giant crab", 
+        "it makes a click-clacking noise, almost like...a giant crab!", 
+        "a pile of claws and shells"
+    ))
+    crab.hp = 5
+    crab.ap = 5
+    crab.attack = 2
+    crab.sensitivity = "blue"
     verb(sea, "seagul", "a seagul squeeks at you", verb="listen")
     # HARBOR
     make_path(dunes, harbor)

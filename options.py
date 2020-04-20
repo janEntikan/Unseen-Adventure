@@ -244,6 +244,7 @@ class Equipment(Item):
         self.equip_option.function = self.equip
         self.bodypart = bodypart
         self.armor = self.attack = 0
+        self.element = None
 
     def post_take(self):
         self.add(self.equip_option)
@@ -500,7 +501,7 @@ class Rolodex(Option):
 class Inventory(Rolodex):
     def __init__(self):
         Rolodex.__init__(self, "inventory")
-        back = self.add(Return("exit inventory", ""))
+        back = self.add(Return("return", ""))
         back.function = self.deactivate
         self.node.set_z(12)
         self.node.reparent_to(render)
