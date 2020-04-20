@@ -3,11 +3,11 @@ from options import *
 from battle import Mob
 
 def world():
-    checkpoint = bedroom = Rolodex("bedroom", "home", True)
+    start_room = checkpoint = bedroom = Rolodex("bedroom", "home", True)
     closet = Rolodex("closet", "home", True)
     hallway = Rolodex("hallway", "home", True)
     livingroom = Rolodex("livingroom", "home", True)
-    start_room = garden = Rolodex("your home", "home", True)
+    garden = Rolodex("your home", "home", True)
     road = Rolodex("town road", "town", True)
     neighbour = Rolodex("miss tover's house", "home", True)
     tover_house = Rolodex("tover house", "home")
