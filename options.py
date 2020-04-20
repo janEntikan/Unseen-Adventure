@@ -226,12 +226,14 @@ class Item(Menu):
                 self.options.remove(self.price_option)
                 self.realign()
             else:
+                base.sounds["error"].play()
                 base.interface.say("You can't afford it.")
                 self.deactivate()
                 base.interface.current = base.interface.room
                 return
         else:
             base.interface.say("You take the " + self.node.name)
+        base.sounds["upup"].play()
         base.interface.current = base.interface.room
         self.parent.remove(self)
         self.add_to_inventory()
@@ -289,6 +291,8 @@ class Move(Option):
         #	True = Keep the rotation from when you last exit this room
         # 	False = Face the same direction as previous room
         #	None = Rotate to first option
+        self.sound = "move"
+
 
     def is_known(self):
         if self.destination.explored:
@@ -298,7 +302,7 @@ class Move(Option):
 
     def go(self):
         if self.destination:
-            base.sounds["move"].play()
+            base.sounds[self.sound].play()
             if self.description:
                 base.interface.say(self.description)
             base.start_sequence(
@@ -329,6 +333,7 @@ class Move(Option):
     def swap(self):
         self.rotate()
         change_room(self.destination)
+
 
 class Nevermind(Move):
     def __init__(self, destination, description):
@@ -395,6 +400,7 @@ class Door(Menu):
                 base.sounds["door_open"].play()
                 base.interface.say("...and open the {}.".format(self.name))
         else:
+            base.sounds["error"].play()
             base.interface.say(self.locked)
 
     def close(self, quietly=False):

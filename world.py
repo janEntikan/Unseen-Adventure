@@ -58,7 +58,7 @@ def world():
         description ="The wooden closet holding your wardrobe."))
         # CLOSET
     closet.add(Door(destination=bedroom, mimic=bedroom_closet_door))
-    closet.add(Item("plain clothes"))
+    closet.add(Equipment("plain clothes", "armor", 0, 0, 2))
         # DESK
     desk = Rolodex("work bench", explored=True)
     bedroom.add(Move("work bench", desk, "you inspect the bench."))
