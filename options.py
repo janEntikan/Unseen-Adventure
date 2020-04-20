@@ -19,6 +19,7 @@ def make_text(text_string, color=(1,1,1,1)):
 
 class Option():
     def __init__(self, name, description=None):
+        self.name = name
         self.freeze = False
         self.mimic = None
         self.node = NodePath(name)
@@ -141,7 +142,7 @@ class Menu(Option):
     def update(self, context):
         self.options[self.selection]
         self.time -= base.dt
-        ud = round(context["ud_a"] + context["ud_b"])
+        ud = context["ud_a"]+context["ud_b"]
         if context["select_a"] or context["select_b"]:
             self.select()   
         elif not ud:
@@ -165,26 +166,62 @@ class Menu(Option):
                 option.text.node().text_color = (0.2,0.2,0.2,1)
 
 
-class Item(Menu):
-    def __init__(self, name, taken=False):
+class NPC(Menu):
+    def __init__(self, name, lines=[]):
         Menu.__init__(self, name)
-        self.taken = taken        
+        self.name = name
+        self.text.node().text_color = (1,0.2,0.5,1)
+        self.line = 0
+        self.lines = lines
+        self.talk = self.add(Return("talk", "You begin a conversation."))
+        self.talk.function = self.say
+
+    def say(self):
+        base.interface.say(self.name+": "+self.lines[self.line])
+        self.line += 1
+        if self.line >= len(self.lines):
+            self.line = 0
+
+
+class Item(Menu):
+    def __init__(self, name, cost=0, taken=False):
+        Menu.__init__(self, name)
+        self.taken = taken
+        self.cost = cost
+        if cost > 0:
+            self.price_option = self.add(Return("Ask for price", "It costs {} gold.".format(self.cost)))
+            take_text = "buy"
+        else:
+           self.price_option = None
+           take_text = "take"
         if not self.taken:
-            self.take_option = self.add(Option("take"))
+            self.take_option = self.add(Option(take_text))
             self.take_option.function = self.take
 
     def add_to_inventory(self):
         base.interface.inventory.add(self)
 
+    def post_take(self):
+        pass
+
     def take(self, activated, activator):
-        base.interface.say("You take the " + self.node.name)
+        if self.cost > 0:
+            if base.interface.money.quantity >= self.cost:
+                base.interface.say("You buy the " + self.node.name)
+            else:
+                base.interface.say("You can't afford it.")
+                self.deactivate()
+                base.interface.current = base.interface.room
+                return
+        else:
+            base.interface.say("You take the " + self.node.name)
         base.interface.current = base.interface.room
         self.parent.remove(self)
         self.add_to_inventory()
         self.options.remove(self.take_option)
         self.take_option.node.detach_node()
         self.realign()
-
+        self.post_take()
 
 class Money(Item):
     def __init__(self, quantity, taken=False):
@@ -199,10 +236,30 @@ class Money(Item):
         base.interface.money.quantity += self.quantity
 
 
+class Equipment(Item):
+    def __init__(self, name, bodypart, cost, attack=0, defence=0):
+        Item.__init__(self, name, cost, False)
+        self.equipped = False
+        self.equip_option = Option("equip")
+        self.equip_option.function = self.equip
+        self.bodypart = bodypart
+        self.armor = self.attack = 0
+
+    def post_take(self):
+        self.add(self.equip_option)
+
+    def equip(self, activated, activator):
+        if base.interface.equipment[self.bodypart]:
+            base.interface.equipment[self.bodypart].text.node().text = self.name
+        base.interface.equipment[self.bodypart] = self
+        self.text.node().text = self.name+" (equipped)"
+        base.interface.say("You equip the " + self.name)
+        base.interface.inventory.deactivate()
+
+
 class Move(Option):
     def __init__(self, name, destination=None, description=None, keep_rotation=True, mimic=None):
         Option.__init__(self, name, description=description)
-        self.name = name
         self.destination = destination
         self.keep_rotation = keep_rotation
         self.mimic = mimic
@@ -227,7 +284,7 @@ class Move(Option):
             base.start_sequence(
                 LerpFunctionInterval(base.camLens.set_fov, 0.2, fromData=base.camLens.get_fov()[0], toData=2, blendType='easeIn'),
                 Func(self.swap),
-                LerpFunctionInterval(base.camLens.set_fov, 0.2, fromData=base.camLens.get_fov()[0], toData=50, blendType='easeIn'),
+                LerpFunctionInterval(base.camLens.set_fov, 0.2, fromData=base.camLens.get_fov()[0], toData=base.base_fov, blendType='easeInOut'),
             )
 
     def activate(self, activator):
@@ -298,11 +355,11 @@ class Door(Menu):
             name = mimic.name
             description = mimic.description
         Menu.__init__(self, "closed "+name)
+        self.name = name
         self.mimic = mimic
         if self.mimic:
             self.mimic.mimic = self
         self.locked = None # Set this to "it's locked!" string to lock
-        self.name = name
         self.description = description
         self.add(Return("feel", description))
         self.action = Return("open", "you take the handle...")
@@ -311,7 +368,7 @@ class Door(Menu):
         self.destination = destination
         self.movement = Move("enter", self.destination, keep_rotation=False)
 
-    def update_mimic(self): # This makes the other side open too in a very shitty way
+    def update_mimic(self):
         if self.mimic:
             if self.mimic.action.function == self.mimic.close:
                 if self.action.function == self.open:
@@ -339,7 +396,7 @@ class Door(Menu):
         self.movement.node.detach_node()
         self.options.remove(self.movement)
         if not quietly:
-            base.sounds["door_closed"].play()
+            base.sounds["door_close"].play()
             base.interface.say("...and close the {}.".format(self.name))
 
 
@@ -372,7 +429,7 @@ class Rolodex(Option):
         self.partition = 360*(1/(len(self.options)))
         for o, option in enumerate(self.options):
             option.node.set_h(-(o*self.partition))
-            option.text.set_y(50)
+            option.text.set_y(80)
 
     def add(self, option):
         option.parent = self

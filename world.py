@@ -1,13 +1,12 @@
 from options import *
 from battle import Mob
-from npc import NPC
 
 def world():
-    start_room = bedroom = Rolodex("bedroom", "home", True)
+    bedroom = Rolodex("bedroom", "home", True)
     closet = Rolodex("closet", "home", True)
     hallway = Rolodex("hallway", "home", True)
     livingroom = Rolodex("livingroom", "home", True)
-    garden = Rolodex("your home", "home", True)
+    start_room = garden = Rolodex("your home", "home", True)
     road = Rolodex("town road", "town", True)
     neighbour = Rolodex("miss tover's house", "home", True)
     tover_house = Rolodex("tover house", "home")
@@ -48,7 +47,7 @@ def world():
     in_mountain_cabin = Rolodex("cabin")
     mines = Rolodex("the mines", "tension")
     #BEDROOM
-    verb(bedroom, "bed", "It is not very soft.")
+    verb(bedroom, "bed", "It is not very soft.") 
     bedroom_livingroom_door = bedroom.add(Door(
         name="door", destination=livingroom, 
         description="a damaged wooden door"))
@@ -57,7 +56,7 @@ def world():
         description ="The wooden closet holding your wardrobe."))
         # CLOSET
     closet.add(Door(destination=bedroom, mimic=bedroom_closet_door))
-    closet.add(Item("plain clothes", "obviously made from very cheap cloth"))
+    closet.add(Item("plain clothes"))
         # DESK
     desk = Rolodex("work bench", explored=True)
     bedroom.add(Move("work bench", desk, "you inspect the bench."))
@@ -72,7 +71,6 @@ def world():
         # WALL HOOKS
     hooks = Rolodex("wall hooks", explored=True)
     livingroom.add(Move("wall hooks", hooks, "you inspect the wall hooks."))
-    hat = hooks.add(Item("hat")).add(Return("feel", "your old tricorne hat."))
     verb(hooks, "wet spot", "a broken rainpipe will do that to you")
     hooks.add(Nevermind(livingroom, "You stop inspecting the wall hooks."))
         # FRONT DOOR AND KEY
@@ -120,13 +118,20 @@ def world():
         "Don't you just love the smell of bread?",
     ]))
     make_path(town_center, road)
+        # ARMORY
     make_open_door(town_center, armory, "armory door")
+    armory.add(Equipment("wooden sword", "weapon", 50, 2, 0))
+    armory.add(Equipment("iron sword", "weapon", 200, 5, 0))
+    armory.add(Equipment("steel sword", "weapon", 1000, 10, 0))
     armory.add(NPC("smith", [
         "What will it be, huh?",
         "Finest steel in the land!",
         "Bending steel is hard work.",
         "We have a special offer on wooden swords today.",
     ]))
+    armory.add(Equipment("leather armor", "armor", 100, 0, 5))
+    armory.add(Equipment("chain armor", "armor", 1000, 0, 10))
+    armory.add(Equipment("plate armor", "armor", 2500, 0, 25))
     verb(town_center, "well", "dank stones. the town's water supply.")
     make_path(town_center, alley)
     alley.add(NPC("thug", [
@@ -141,13 +146,22 @@ def world():
         "A room is 25 gold a night.",
         "This mead comes all the way from Albaden.",
     ]))
+    # MAGIC SHOP
     make_open_door(town_center, magicshop, "magicshop door")
+    
+    magicshop.add(Item("red potion", cost=50))
+    magicshop.add(Item("green potion", cost=50))
+    magicshop.add(Item("blue potion", cost=50))
     magicshop.add(NPC("magician", [
         "Spells and curses for sale.",
         "Careful, that's very unstable!",
         "I can tell you have a good ear for magic.",
         "Magic, ladies and gentlemen.",
     ]))
+    magicshop.add(Equipment("blue pendant", "necklace", cost=500))
+    magicshop.add(Equipment("green pendant", "necklace", cost=500))
+    magicshop.add(Equipment("red pendant", "necklace", cost=500))
+
     make_open_door(town_center, training, "trainer door")
     training.add(NPC("trainer", [
         "Need some training?",

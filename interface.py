@@ -28,6 +28,13 @@ class Interface():
         self.location.node().font = base.font
         self.location.set_scale(0.025, 0.025, 0.045)
         self.location.set_z(0.1)
+
+        self.equipment = {
+            "armor":None,
+            "weapon":None,
+            "helmet":None,
+            "necklace":None,
+        }
         
     def say(self, output_string):
         self.to_output.append(output_string)

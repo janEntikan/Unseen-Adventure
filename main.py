@@ -34,6 +34,8 @@ class GameApp(ShowBase):
         self.transition = Transitions(loader)
         self.font = loader.load_font("probe.ttf")
         self.load_sounds()
+        self.base_fov = 35
+        base.camLens.set_fov(self.base_fov)
         self.interface = Interface()
         self.sequence = None
         self.sequence_end = Func(self.end_sequence)
