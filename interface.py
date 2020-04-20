@@ -14,7 +14,7 @@ class Interface():
         self.output.set_z(-0.75)
         self.to_output = ["","","", ""]
         self.inventory = Inventory()
-        self.money = self.inventory.add(Money(20000, True))
+        self.money = self.inventory.add(Money(10, True))
         self.inventory.hide()
         self.say("press i for inventory")
         self.say("press c to check yourself")
@@ -30,7 +30,7 @@ class Interface():
         self.location.set_scale(0.025, 0.025, 0.045)
         self.location.set_z(0.1)
 
-        self.hp = 1
+        self.hp = 10
         self.status = "normal"
         self.level = 1
         self.xp = 0
@@ -49,6 +49,7 @@ class Interface():
         self.character.add(Option("experience")).function=get_xp
 
     def die(self):
+        base.play_music(None)
         self.say("You die...")
         self.money.quantity = int(self.money.quantity/4)
         base.transition.setFadeColor(0.1,0,0)
