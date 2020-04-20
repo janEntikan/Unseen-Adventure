@@ -1,6 +1,6 @@
 from panda3d.core import TextNode
 from panda3d.core import NodePath
-from direct.interval.IntervalGlobal import LerpFunctionInterval, Func
+from direct.interval.IntervalGlobal import LerpFunctionInterval, Func, Wait
 
 
 def in_margin(n, min, max):
@@ -15,6 +15,21 @@ def make_text(text_string, color=(1,1,1,1)):
     text.align = 2
     text_node = NodePath(text)
     return text_node
+
+
+def change_room(destination):
+    base.interface.room.node.detach_node()
+    if destination.song:
+        base.play_music(destination.song)
+    base.interface.location.node().text = destination.node.name
+    destination.explored = True
+    destination.snap()
+    destination.update_mimic()
+    for option in destination.options:
+        option.is_known()
+    base.interface.room = destination
+    base.interface.current = base.interface.room
+    base.interface.current.node.reparent_to(render)
 
 
 class Option():
@@ -208,6 +223,8 @@ class Item(Menu):
         if self.cost > 0:
             if base.interface.money.quantity >= self.cost:
                 base.interface.say("You buy the " + self.node.name)
+                self.options.remove(self.price_option)
+                self.realign()
             else:
                 base.interface.say("You can't afford it.")
                 self.deactivate()
@@ -243,13 +260,15 @@ class Equipment(Item):
         self.equip_option = Option("equip")
         self.equip_option.function = self.equip
         self.bodypart = bodypart
-        self.armor = self.attack = 0
+        self.armor, self.attack = defence, attack
         self.element = None
 
     def post_take(self):
         self.add(self.equip_option)
 
     def equip(self, activated, activator):
+        if not self.bodypart in base.interface.equipment:
+            base.interface.equipment[self.bodypart] = None
         if base.interface.equipment[self.bodypart]:
             base.interface.equipment[self.bodypart].text.node().text = self.name
         base.interface.equipment[self.bodypart] = self
@@ -308,20 +327,8 @@ class Move(Option):
                 self.destination.get_closest_selection(base.interface.room.rotation)
 
     def swap(self):
-        base.interface.room.node.detach_node()
         self.rotate()
-        if self.destination.song:
-            base.play_music(self.destination.song)
-        base.interface.location.node().text = self.destination.node.name
-        self.destination.explored = True
-        self.destination.snap()
-        self.destination.update_mimic()
-        for option in self.destination.options:
-            option.is_known()
-        base.interface.room = self.destination
-        base.interface.current = base.interface.room
-        base.interface.current.node.reparent_to(render)
-
+        change_room(self.destination)
 
 class Nevermind(Move):
     def __init__(self, destination, description):

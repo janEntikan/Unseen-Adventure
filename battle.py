@@ -1,3 +1,4 @@
+from random import randint
 from direct.interval.IntervalGlobal import Func, Wait, SoundInterval
 from options import *
 
@@ -15,8 +16,10 @@ class Mob(Menu):
         self.text.node().text_color = (1,0,0,1)
         self.sensitivity = None
         self.hp = 1
-        self.ap = 10
-        self.attack = 4
+        self.ap = 1
+        self.xp = 10
+        self.cash = randint(0,10)
+        self.attack = 1
 
     def meet(self):
         if not self.name in base.interface.creature_codex:
@@ -46,12 +49,18 @@ class Mob(Menu):
         self.selection = 0
         self.add(Return("nevermind", "you leave it"))
         self.add(Return("feel", self.death_description))
+        s = "You "
+        if self.cash > 0:
+            s = "You find {} gold and ".format(self.cash)
+        s += "recieve {} xp.".format(self.xp)
+        base.interface.say(s)
+        base.interface.xp += self.xp
+        base.interface.money.quantity += self.cash
 
     def hurt(self, color):
         base.transition.setFadeColor(*color)
         base.transition.fadeOut(0)
         base.transition.fadeIn(0.04)
-        base.sounds["hit1"].play()
 
     def turn(self):
         ap = 1
@@ -62,17 +71,22 @@ class Mob(Menu):
                 if item.element:
                     if item.element == self.sensitivity:
                         ap *= 1.5
-        attack = int(self.attack/ap)
+        attack = int(self.attack-ap)
+        if attack < 1: attack = 1
         base.interface.hp -= attack
         base.start_sequence(            
             Wait(1.0),
             Func(base.interface.say, "It attacks!"),
             Func(self.hurt, (1,0,0)),
             Func(base.interface.say, "It hits you for {} points.".format(attack)),
+            Func(base.sounds["hit0"].play),
+            Func(self.kill_player),
         )
+        self.player_is_defending = False
+
+    def kill_player(self):
         if base.interface.hp < 0:
             base.interface.die()
-        self.player_is_defending = False
 
     def defend(self):
         self.player_is_defending = True
@@ -84,18 +98,21 @@ class Mob(Menu):
             item = base.interface.equipment[bodypart]
             if item:
                 attack += item.attack
+                print(bodypart, item.attack)
                 if item.element:
                     if item.element == self.sensitivity:
                         attack *= 1.5
-        attack = int(attack/self.ap)+1
+        attack = int(attack-self.ap)
+        if attack < 1: attack = 1
         self.hp -= attack
+        base.sounds["hit{}".format(randint(1,3))].play()
         base.interface.say("You do {} damage.".format(attack))        
         base.start_sequence(
             Func(self.hurt, (1,1,1)),
             Wait(0.25),
         )
         self.cam_shake(attack/10)
-        if self.hp <= 0:
+        if self.hp < 1:
             self.die()
         else:
             self.turn()

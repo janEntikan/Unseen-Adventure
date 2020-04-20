@@ -1,8 +1,9 @@
+from random import randint
 from options import *
 from battle import Mob
 
 def world():
-    bedroom = Rolodex("bedroom", "home", True)
+    checkpoint = bedroom = Rolodex("bedroom", "home", True)
     closet = Rolodex("closet", "home", True)
     hallway = Rolodex("hallway", "home", True)
     livingroom = Rolodex("livingroom", "home", True)
@@ -219,30 +220,26 @@ def world():
     # SEA DIRECTION
     verb(dunes, "seashell", "it emulates the ocean sound", verb="listen")
 
-    crab = dunes.add(Mob(
-        "giant crab", 
-        "it makes a click-clacking noise, almost like...a giant crab!", 
-        "a pile of claws and shells"
-    ))
-    crab.hp = 5
-    crab.ap = 5
-    crab.attack = 2
-    crab.sensitivity = "blue"
-
+    def spawn_crab(where):
+        crab = where.add(Mob(
+            "giant crab", 
+            "it makes a click-clacking noise, almost like...a giant crab!", 
+            "a pile of claws and shells"
+        ))
+        crab.hp = 5
+        crab.ap = 2
+        crab.xp = 15
+        crab.cash = randint(2, 10)
+        crab.attack = 2
+        crab.sensitivity = "blue"
+    
+    spawn_crab(dunes)
     make_path(dunes, sea)
     verb(dunes, "grass patch", "a patch of grass surrounded by warm sand")
     # SEA
     verb(sea, "seaweed", "a bit of seaweed washed ashore")
     verb(sea, "sea", "you hear crashing ocean waves", verb="listen")
-    crab = sea.add(Mob(
-        "giant crab", 
-        "it makes a click-clacking noise, almost like...a giant crab!", 
-        "a pile of claws and shells"
-    ))
-    crab.hp = 5
-    crab.ap = 5
-    crab.attack = 2
-    crab.sensitivity = "blue"
+    spawn_crab(sea)
     verb(sea, "seagul", "a seagul squeeks at you", verb="listen")
     # HARBOR
     make_path(dunes, harbor)
@@ -323,4 +320,4 @@ def world():
     verb(waterfall, "puddle", "you go splish splash", verb="splash")
     verb(waterfall, "waterfall", "A fog of water tickles your face. sparkles!")
     verb(waterfall, "wet boulder", "water from the waterfall moistens this boulder")
-    return start_room
+    return start_room, checkpoint

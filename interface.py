@@ -14,11 +14,11 @@ class Interface():
         self.output.set_z(-0.75)
         self.to_output = ["","","", ""]
         self.inventory = Inventory()
-        self.money = self.inventory.add(Money(10, True))
+        self.money = self.inventory.add(Money(20000, True))
         self.inventory.hide()
         self.say("press i for inventory")
         self.say("press c to check yourself")
-        self.room = world()  
+        self.room, self.checkpoint = world()  
         self.room.node.reparent_to(render)
         base.play_music(self.room.song)
         self.current = self.room
@@ -30,7 +30,7 @@ class Interface():
         self.location.set_scale(0.025, 0.025, 0.045)
         self.location.set_z(0.1)
 
-        self.hp = 10
+        self.hp = 1
         self.status = "normal"
         self.level = 1
         self.xp = 0
@@ -48,6 +48,18 @@ class Interface():
         self.character.add(Option("level")).function=get_level
         self.character.add(Option("experience")).function=get_xp
 
+    def die(self):
+        self.say("You die...")
+        self.money.quantity = int(self.money.quantity/4)
+        base.transition.setFadeColor(0.1,0,0)
+        base.end_sequence()
+        base.start_sequence(
+            Func(base.transition.fadeOut, 2),
+            Wait(3),
+            Func(change_room, self.checkpoint),
+            Func(base.transition.fadeIn, 2),
+            Func(self.say, "...and wake up!")
+        )
         
     def say(self, output_string):
         self.to_output.append(output_string)
