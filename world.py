@@ -1,10 +1,10 @@
 from random import randint
 from options import *
-from enemies import _bunny, _crab, _goat, _wizard, _unicorn
+from enemies import _bunny, _crab, _goat, _robber, _wizard, _unicorn
 
 
 def world():
-    checkpoint = bedroom = Rolodex("bedroom", "home", True)
+    start_room = checkpoint = bedroom = Rolodex("bedroom", "home", True)
     closet = Rolodex("closet", "home", True)
     hallway = Rolodex("hallway", "home", True)
     livingroom = Rolodex("livingroom", "home", True)
@@ -23,7 +23,7 @@ def world():
     castle_gate = Rolodex("castle gate", "town", True)
     bank = Rolodex("bank", "shop")
     castle = Rolodex("castle","tension")
-    start_room = town_bridge = Rolodex("town bridge", "forrest", True)
+    town_bridge = Rolodex("town bridge", "forrest", True)
     crossroads = Rolodex("crossroads", "forrest", True, spawn=_bunny)
     long_road = Rolodex("long road", "forrest", spawn=_bunny)
     dunes = Rolodex("dunes", "forrest", spawn=_crab)
@@ -48,8 +48,54 @@ def world():
     canyon_path = Rolodex("mountain path", "forrest", spawn=_goat)
     mountain_cabin = Rolodex("cabin", spawn=_goat)
     in_mountain_cabin = Rolodex("cabin", spawn=_goat)
-    mines = Rolodex("the mines", "tension")
-    
+    mines = Rolodex("mine entrance", "tension")
+
+    # MINE DUNGEON
+    mine = Rolodex("mine opening", "tension")
+    mine_a = Rolodex("corridor", "tension")
+    mine_b = Rolodex("corridor", "tension")
+    mine_c = Rolodex("corridor", "tension")
+    mine_d = Rolodex("corridor", "tension")
+    mine_e = Rolodex("room", "tension")
+    mine_f = Rolodex("room", "tension")
+    mine_g = Rolodex("corridor", "tension")
+    mine_h = Rolodex("dead end", "tension")
+    mine_i = Rolodex("dead end", "tension") # David is here.
+    make_path(mine, mine_a)
+    make_path(mine_a, mine_e)
+    make_path(mine_b, mine_e)
+    make_path(mine_b, mine_h)
+    make_path(mine_c, mine_e)
+    make_path(mine_c, mine_f)
+    make_path(mine_d, mine_f)
+    make_path(mine_g, mine_f)
+    make_path(mine_g, mine_i)
+
+    # WIZ TOWER DUNGEON
+    tower_entrance = Rolodex("entrance", "tension")
+    wiz_1 = Rolodex("first floor", "tension")
+    wiz_2 = Rolodex("second floor", "tension")
+    wiz_3 = Rolodex("third floor", "tension")
+    wiz_4 = Rolodex("fourth floor", "tension")
+    wiz_5 = Rolodex("top floor", "tension")
+    make_path(tower_entrance, wiz_1)
+    verb(wiz_1, "torch", "you see as well without one", verb="take")
+    wiz_1.add(Move("staircase up", wiz_2, "you climb the stairs")) 
+    verb(wiz_1, "torch", "you see as well without one", verb="take")
+    verb(wiz_2, "torch", "you see as well without one", verb="take")
+    wiz_2.add(Move("staircase up", wiz_3, "you climb the stairs")) 
+    verb(wiz_2, "torch", "you see as well without one", verb="take")
+    verb(wiz_3, "torch", "you see as well without one", verb="take")
+    wiz_3.add(Move("staircase up", wiz_4, "you climb the stairs")) 
+    verb(wiz_3, "torch", "you see as well without one", verb="take")
+    verb(wiz_4, "torch", "you see as well without one", verb="take")
+    wiz_4.add(Move("staircase up", wiz_5, "you climb the stairs")) 
+    verb(wiz_4, "torch", "you see as well without one", verb="take")
+    verb(wiz_5, "torch", "you see as well without one", verb="take")
+    humming_rock = wiz_5.add(Item("humming rock"))
+    humming_rock.add(Return("feel", "it vibrates in your hand"))
+    verb(wiz_5, "torch", "you see as well without one", verb="take")
+
     #BEDROOM
     def sleep():
         base.interface.say("good night!")
@@ -91,7 +137,7 @@ def world():
     verb(hooks, "wet spot", "a broken rainpipe will do that to you", has_money=False)
     hooks.add(Nevermind(livingroom, "You stop inspecting the wall hooks."))
         # FRONT DOOR AND KEY
-    def unlock_front_door(activated, activator):
+    def unlock_front_door():
         if front_door.locked:
             front_door.locked = None
             base.interface.say("You unlock the door with a satisfying click.")
@@ -122,7 +168,7 @@ def world():
     verb(neighbour, "flowers", "Miss Tover likes flowers almost as much as you do")
     make_open_door(neighbour, tover_house, "front door")
     verb(neighbour, "small tree", "a very dry old pine tree.")
-    tover_house.add(NPC("miss tover", [
+    tover = tover_house.add(NPC("miss tover", [
         "Ah it's you. Can do anything for you?",
         "I haven't stepped outside this town in over 30 years.",
         "Did you ever leave the city?",
@@ -256,9 +302,7 @@ def world():
     verb(in_mountain_cabin, "hole in floor", "the hole exposes a crack in the foundation")
     verb(in_mountain_cabin, "torn wallpaper", "there's a tear in the wallpaper here")
     make_path(canyon_path, mines)
-    mines.add(NPC("miner", [
-        "Sorry, but this mine is off limits."
-    ]))
+    mine_foreman = mines.add(NPC("foreman", ["Sorry, but this mine is currently off limits."]))
     # FORREST DIRECTION
     verb(forrest_path, "big tree", 
         "you can't quite put your arms around it")
@@ -308,7 +352,14 @@ def world():
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
     # STRANGE ROCK
     make_path(clearing, strange_rock)
-    verb(strange_rock, "strange rock", "An enormous strange, vibrating stone")
+    verb(strange_rock, "strange rock", "An enormous, strangely vibrating stone")
+    def open_rock_portal():
+        base.interface.say("A loud explosion marks the opening of a portal.")
+        #make_path(strange_rock, strange_world)      
+    humming_rock.add(Use(
+        "place", "Better hold on to it for a little while longer.", 
+        strange_rock, open_rock_portal))
+
     # BONFIRE
     make_path(clearing, bonfire)
     verb(bonfire, "bonfire", "there's a fire here, someone must have been here only recently")
@@ -318,8 +369,137 @@ def world():
     verb(candy_house, "candy house", "A house made of candy but you don't taste an entrance.", verb="taste")
     verb(candy_house, "candy fence", "a picket fence made of...candy", verb="taste")
     # WATERFALL
-    #make_path(waterfall, cave) # TODO: Cave is behind the waterfall
     verb(waterfall, "puddle", "you go splish splash", verb="splash")
     verb(waterfall, "waterfall", "A fog of water tickles your face. sparkles!")
     verb(waterfall, "wet boulder", "water from the waterfall moistens this boulder")
-    return start_room, checkpoint
+
+    # QUESTS!
+    # MAIN QUEST
+    def allow_mine_entrance():
+        base.sounds["quest_found"].play()
+        base.interface.say("foreman: Allright you can go in. But watch out!")
+        base.interface.say("foreman: Not sure how but it's swarming with monsters now.")
+        mine_foreman.lines = [
+            "Go ahead, the entrance is right here.",
+            "Carefull now, it's dangerous in there.",
+            "I'm not sure how it happened but it's swarming with monsters.",
+            "I'm just glad I got out alive.",
+        ]
+        make_path(mine, mines)
+
+    def open_magic_door():
+        base.sounds["quest_found"].play()
+        base.interface.say("The door vanishes with a loud fizzle")
+        tower.remove(tower_door)
+        tower.add(tower_entrance)
+
+    quest = tover.add(Return("quest", ""))
+    def get_tover_quest():
+        base.sounds["quest_found"].play()
+        tover.remove(quest)
+        tover.lines = [
+            "Please find my son in the mines.",
+            "Thank you so much!",
+        ]
+        base.interface.say("Please find my son in the mines.")
+        base.interface.say("I haven't seen him in days.")
+        base.interface.say("You can show the foreman this to get in.")
+        entry = base.interface.inventory.add(Item("mine entry pass"))
+        entry.function_once = True
+        entry.add(Use(
+            "show", "Not interested.", 
+            mine_foreman, allow_mine_entrance))
+    quest.function = get_tover_quest
+    quest.function_once = True
+
+    david = mine_i.add(NPC("david", [
+        "You found me, thank god.",
+        "I thought I was a goner for sure.",
+        "Please help me get this rock off me.",
+    ]))
+    quest_end = david.add(Return("quest", ""))
+    def has_ring():
+        david.lines = [
+            "I'm forever in debt to you.",
+            "My grandfather's ring is very important to me.",
+            "You've been great help. Thanks a lot!",
+            "Amazing!",
+        ]
+        base.interface.say("david: My ring! This is amazing!")
+        base.interface.say("david: I hope this is enough of a reward.")
+        base.interface.xp += 500
+        base.interface.money.quantity += 500
+        base.interface.say("You recieve 500 gold and 500 xp")
+        base.interface.say("David gives you a bottle of magic-seal-away")
+        sealaway = base.interface.inventory.add(Item("mine entry pass"))
+        sealaway.function_once = True
+        sealaway.add(Use(
+            "apply", "It's not a magically sealed door.",
+            tower_door, open_magic_door))
+    davids_quest = Return("quest", "")
+    davids_quest.function_once = True
+    def david_quest():
+        base.sounds["quest_found"].play()
+        david.remove(davids_quest)
+        david.lines = [
+            "I am eternally greatful.",
+            "Most people don't help other's more than once.",
+            "You are really amazing for doing this.",
+        ]
+        base.interface.say("David: Can you please find my ring?")
+        base.interface.say("David: I was robbed of it in the forrest.")
+        bonfire.add(_robber())
+        bonfire.add(_robber())
+        bonfire.add(_robber())
+        ring = bonfire.add(Item("ring"))
+        ring.function_once = True
+        ring.add(Use(
+            "show", "Not interested.", 
+            david, has_ring))
+        bonfire.add(_robber())
+        bonfire.add(_robber())
+        bonfire.add(_robber())
+    davids_quest.function = david_quest
+
+    def help_david():
+        david.remove(quest_end)
+        base.sounds["quest_success"].play()
+        base.interface.say("david: Help me get this rock off me please!")
+        base.interface.say("david: one...two...THREE!")
+        base.interface.say("david: let's get out of here.")
+        base.interface.say("david: meet me at my mom's house.")
+        change_room(mines)
+        david.parent.remove(david)
+        tover_house.add(david)
+        tover.lines = [
+            "I have my boy back!",
+            "I can't thank you enough!",
+            "Thanks! I'll tell everyone what you did.",
+        ]
+        david.lines = [
+            "Thank you so much for saving me.",
+            "But I'm not out of the woodworks yet.",
+            "I need your help once more.",
+        ]
+        david.add(davids_quest)
+
+    quest_end.function_once = True
+    quest_end.function = help_david
+
+    def test():
+        test_functions = [
+            get_tover_quest,
+            allow_mine_entrance,
+            help_david,
+            david_quest,
+            has_ring,
+            open_magic_door,
+            open_rock_portal
+        ]
+        for f in test_functions:
+            try:
+                f()
+            except TypeError:
+                f("ok", "bye")
+    
+    return start_room, checkpoint, test

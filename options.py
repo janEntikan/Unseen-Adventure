@@ -87,9 +87,19 @@ class Option():
         if self.description:
             base.interface.say(self.description)
         if self.function:
-            self.function(self, activator)
+            self.function()
             if self.function_once:
                 self.function = None
+
+    def realign(self):
+        self.options.reverse()
+
+    def remove(self, option):
+        if option in self.options:
+            self.options.remove(option)
+            option.node.detach_node()
+            self.options.reverse()
+            self.realign()
 
     def update(self, context):
         pass
@@ -368,9 +378,11 @@ class Use(Return):
         if (self.working_option == None or 
                 self.working_option == base.interface.room.get_current()):
             if self.function:
-                self.function(self, activator)
+                self.function()
                 if self.function_once:
                     self.function = None
+                    base.interface.inventory.options.remove(self.parent)
+                    self.parent.node.detach_node()
             else:
                 base.interface.say(self.description)
         else:

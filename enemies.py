@@ -9,7 +9,7 @@ def _bunny():
         "it's completely mangled"
     )
     creature.hp = 3
-    creature.ap = 2
+    creature.ap = 1
     creature.xp = 25
     creature.cash = randint(2, 12)
     creature.attack = 2
@@ -24,10 +24,10 @@ def _crab():
         "a pile of cans, claws and shells"
     )
     creature.hp = 5
-    creature.ap = 2
-    creature.xp = 15
-    creature.cash = randint(2, 10)
-    creature.attack = 2
+    creature.ap = 5
+    creature.xp = 100
+    creature.cash = randint(25, 75)
+    creature.attack = 4
     creature.sensitivity = "blue"
     if randint(0,1)==1:
         return creature
@@ -35,17 +35,31 @@ def _crab():
 def _goat():
     creature = Mob(
         "demon goat", 
-        "you can hear hoves on the rocks below, sounds almost like...a demon goat!", 
+        "you can hear hoves on rocks...a demon goat!", 
         "a human chest and the body of a goat, weird"
     )
     creature.hp = 5
-    creature.ap = 1
-    creature.xp = 25
-    creature.cash = randint(10, 20)
-    creature.attack = 5
-    creature.sensitivity = None
+    creature.ap = 2
+    creature.xp = 50
+    creature.cash = randint(15, 50)
+    creature.attack = 3
+    creature.sensitivity = "red"
     if randint(0,1)==1:
         return creature
+    return creature
+
+def _robber():
+    creature = Mob(
+        "robber", 
+        "a bag of money and the chewing of knives...a robber!", 
+        "a crumpled heap of humanoid flesh"
+    )
+    creature.hp = 15
+    creature.ap = 5
+    creature.xp = 150
+    creature.cash = randint(50, 100)
+    creature.attack = 5
+    creature.sensitivity = "green"
     return creature
 
 def _wizard():

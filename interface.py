@@ -18,7 +18,7 @@ class Interface():
         self.inventory.hide()
         self.say("press i for inventory")
         self.say("press c to check yourself")
-        self.room, self.checkpoint = world()  
+        self.room, self.checkpoint, self.test = world()  
         self.room.node.reparent_to(render)
         base.play_music(self.room.song)
         self.current = self.room
@@ -51,7 +51,6 @@ class Interface():
 
         self.dead = Rolodex("dead")
         self.dead.add(Option("You died."))
-
 
     def die(self):
         change_room(self.dead)

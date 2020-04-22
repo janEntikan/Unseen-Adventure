@@ -98,7 +98,7 @@ class Mob(Menu):
         if randint(0, 1) == 0:
             base.interface.say("You run away")
             self.parent.freeze = False
-            self.parent.rotate(choice(-1,1))            
+            self.parent.rotate(choice((-1,1)))            
         else:
             base.interface.say("...but you couldn't!")
             self.turn()

@@ -39,6 +39,7 @@ class GameApp(ShowBase):
         self.interface = Interface()
         self.sequence = None
         self.sequence_end = Func(self.end_sequence)
+        #self.interface.test()
         taskMgr.add(self.update)
 
     def load_sounds(self):
@@ -50,7 +51,8 @@ class GameApp(ShowBase):
             "rotate", "select", "move",
             "hit0", "hit1", "hit2", "hit3",
             "down", "upup", "money", "equip",
-            "door_open", "door_close", "youdie"
+            "door_open", "door_close", "youdie",
+            "quest_found", "quest_success",
         )
         musics = (
             "home", "town", "shop", "tension",
