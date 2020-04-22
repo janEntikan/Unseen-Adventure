@@ -1,9 +1,10 @@
 from random import randint
 from options import *
-from battle import Mob
+from enemies import _bunny, _crab, _goat, _wizard, _unicorn
+
 
 def world():
-    start_room = checkpoint = bedroom = Rolodex("bedroom", "home", True)
+    checkpoint = bedroom = Rolodex("bedroom", "home", True)
     closet = Rolodex("closet", "home", True)
     hallway = Rolodex("hallway", "home", True)
     livingroom = Rolodex("livingroom", "home", True)
@@ -22,34 +23,48 @@ def world():
     castle_gate = Rolodex("castle gate", "town", True)
     bank = Rolodex("bank", "shop")
     castle = Rolodex("castle","tension")
-    town_bridge = Rolodex("town bridge", "forrest", True)
-    crossroads = Rolodex("crossroads", "forrest", True)
-    long_road = Rolodex("long road", "forrest")
-    dunes = Rolodex("dunes", "forrest")
-    sea = Rolodex("sea", "forrest")
-    harbor = Rolodex("the harbor", "tension")
-    forrest_path = Rolodex("forrest path", "forrest")
-    river = Rolodex("river", "forrest")
-    forrest = Rolodex("forrest", "forrest")
+    start_room = town_bridge = Rolodex("town bridge", "forrest", True)
+    crossroads = Rolodex("crossroads", "forrest", True, spawn=_bunny)
+    long_road = Rolodex("long road", "forrest", spawn=_bunny)
+    dunes = Rolodex("dunes", "forrest", spawn=_crab)
+    sea = Rolodex("sea", "forrest", spawn=_crab)
+    harbor = Rolodex("the harbor", "tension", spawn=_crab)
+    forrest_path = Rolodex("forrest path", "forrest", spawn=_bunny)
+    river = Rolodex("river", "forrest", spawn=_bunny)
+    forrest = Rolodex("forrest", "forrest", spawn=_bunny)
     lake = Rolodex("the lake", "forrest")
-    clearing = Rolodex("clearing", "forrest")
+    clearing = Rolodex("clearing", "forrest",spawn=_bunny)
     waterfall = Rolodex("waterfall", "forrest")
     cave = Rolodex("cave", "tension")
     bonfire = Rolodex("bonfire", "tension")
-    tower = Rolodex("wizard tower", "tension")
-    forrest_cabin = Rolodex("cabin", "forrest")
+    tower = Rolodex("wizard tower", "tension",spawn=_wizard)
+    forrest_cabin = Rolodex("cabin", "forrest", spawn=_bunny)
     in_forrest_cabin = Rolodex("cabin", "tension")
-    deep_forrest = Rolodex("deep forrest", "forrest")
-    strange_rock = Rolodex("strange rock", "tension")
+    deep_forrest = Rolodex("deep forrest", "forrest", spawn=_unicorn)
+    strange_rock = Rolodex("strange rock", "tension", spawn=_unicorn)
     candy_house = Rolodex("candy house", "tension")
     ufo = Rolodex("crashlanded ufo")
-    mountain_path = Rolodex("canyon path", "forrest")
-    canyon_path = Rolodex("mountain path", "forrest")
-    mountain_cabin = Rolodex("cabin")
-    in_mountain_cabin = Rolodex("cabin")
+    mountain_path = Rolodex("canyon path", "forrest", spawn=_goat)
+    canyon_path = Rolodex("mountain path", "forrest", spawn=_goat)
+    mountain_cabin = Rolodex("cabin", spawn=_goat)
+    in_mountain_cabin = Rolodex("cabin", spawn=_goat)
     mines = Rolodex("the mines", "tension")
+    
     #BEDROOM
-    verb(bedroom, "bed", "It is not very soft.") 
+    def sleep():
+        base.interface.say("good night!")
+        base.transition.setFadeColor(0,0,0)
+        base.start_sequence(
+            Func(base.transition.fadeOut, 2),
+            Wait(4),
+            Func(base.transition.fadeIn, 2),
+            Func(base.interface.say, "...and wake up!"),
+            Func(base.interface.say, "you feel refreshed!"),
+        )
+        
+        base.interface.hp = base.interface.max_hp
+    bed = verb(bedroom, "bed", "It is not very soft.")
+    bed.add(Return("sleep", "you step in the bed")).function = sleep
     bedroom_livingroom_door = bedroom.add(Door(
         name="door", destination=livingroom, 
         description="a damaged wooden door"))
@@ -73,7 +88,7 @@ def world():
         # WALL HOOKS
     hooks = Rolodex("wall hooks", explored=True)
     livingroom.add(Move("wall hooks", hooks, "you inspect the wall hooks."))
-    verb(hooks, "wet spot", "a broken rainpipe will do that to you")
+    verb(hooks, "wet spot", "a broken rainpipe will do that to you", has_money=False)
     hooks.add(Nevermind(livingroom, "You stop inspecting the wall hooks."))
         # FRONT DOOR AND KEY
     def unlock_front_door(activated, activator):
@@ -92,8 +107,9 @@ def world():
     livingroom_chair.add(Return("sit", "You sit down for a few, and stand up again."))
     livingroom.add(Door(destination=bedroom, name="door", mimic=bedroom_livingroom_door))
     livingroom_bookcase = livingroom.add(Menu("piano"))
-    livingroom_bookcase.add(Return("listen", "E3 is a little flat. Could use another tune up."))
+    livingroom_bookcase.add(Return("listen", "B2 is a little flat. Could use another tune up."))
     livingroom_bookcase.add(Return("feel", "The keys are nice and weighty."))
+    livingroom_bookcase.add(Return("play", "You play the first three notes of toccata et fugue."))
     # GARDEN
     verb(garden, "flowerbed", "they smell so good", verb="smell")
     garden.add(Door(destination=livingroom, name="front door", mimic=front_door))
@@ -138,7 +154,7 @@ def world():
         "Bending steel is hard work.",
         "We have a special offer on wooden swords today.",
     ]))
-    armory.add(Equipment("leather armor", "armor", 100, 0, 5))
+    armory.add(Equipment("leather armor", "armor", 250, 0, 5))
     armory.add(Equipment("chain armor", "armor", 1000, 0, 10))
     armory.add(Equipment("plate armor", "armor", 2500, 0, 25))
     verb(town_center, "well", "dank stones. the town's water supply.")
@@ -163,7 +179,7 @@ def world():
     inn.add(NPC("innkeeper", [
         "Come in! Have a seat!",
         "What can I get you?",
-        "A room is 25 gold a night.",
+        "A room is 30 gold a night.",
         "This mead comes all the way from Albaden.",
     ]))
     inn.add(Move("seat", inn_seat, "you take a seat")) 
@@ -219,55 +235,24 @@ def world():
     verb(long_road, "street lantern", "provides illumination to those who need it")
     # SEA DIRECTION
     verb(dunes, "seashell", "it emulates the ocean sound", verb="listen")
-
-    def spawn_crab(where):
-        crab = where.add(Mob(
-            "giant crab", 
-            "it makes a click-clacking noise, almost like...a giant crab!", 
-            "a pile of claws and shells"
-        ))
-        crab.hp = 5
-        crab.ap = 2
-        crab.xp = 15
-        crab.cash = randint(2, 10)
-        crab.attack = 2
-        crab.sensitivity = "blue"
-    
-    spawn_crab(dunes)
     make_path(dunes, sea)
     verb(dunes, "grass patch", "a patch of grass surrounded by warm sand")
-    # SEA
+        # SEA
     verb(sea, "seaweed", "a bit of seaweed washed ashore")
+    make_path(sea, harbor)
     verb(sea, "sea", "you hear crashing ocean waves", verb="listen")
-    spawn_crab(sea)
     verb(sea, "seagul", "a seagul squeeks at you", verb="listen")
-    # HARBOR
+        # HARBOR
     make_path(dunes, harbor)
     verb(harbor, "the harbor", "You smell a lot of fish! All ashore!", verb="listen")
     # MOUNTAIN DIRECTION
-    def spawn_goat(where):
-        goat_boy = where.add(Mob(
-            "goat man", 
-            "you can hear hoves on the rocks below, sounds almost like...a goat man!", 
-            "a dead human torso strapped to the body of a goat"
-        ))
-        goat_boy.hp = 5
-        goat_boy.ap = 1
-        goat_boy.xp = 25
-        goat_boy.cash = randint(10, 20)
-        goat_boy.attack = 5
-        goat_boy.sensitivity = None
-
     verb(mountain_path, "canyon view", "You throw a pebble. Long way down.", verb="listen")
     make_path(mountain_path, canyon_path)
-    spawn_goat(mountain_path)
     verb(mountain_path, "cliff face", "an vertical, cold cliff face")
     verb(canyon_path, "stack of rocks", "someone has stacked some rocks on top of eachother")
     make_path(canyon_path, mountain_cabin)
     make_open_door(mountain_cabin, in_mountain_cabin, "cabin door")
-    spawn_goat(canyon_path)
     verb(in_mountain_cabin, "broken table", "this table is missing two legs")
-    spawn_goat(in_mountain_cabin)
     verb(in_mountain_cabin, "hole in floor", "the hole exposes a crack in the foundation")
     verb(in_mountain_cabin, "torn wallpaper", "there's a tear in the wallpaper here")
     make_path(canyon_path, mines)
@@ -275,23 +260,9 @@ def world():
         "Sorry, but this mine is off limits."
     ]))
     # FORREST DIRECTION
-    def spawn_bunny(where):
-        creature = where.add(Mob(
-            "bomber bunny", 
-            "you can hear sizzles and maniacal laughter...a bomber bunny!", 
-            "it's completely mangled"
-        ))
-        creature.hp = 3
-        creature.ap = 3
-        creature.xp = 25
-        creature.cash = randint(2, 12)
-        creature.attack = 2
-        creature.sensitivity = "green"
-
     verb(forrest_path, "big tree", 
         "you can't quite put your arms around it")
     make_path(forrest_path, lake)
-    spawn_bunny(forrest_path)
     verb(forrest_path, "bench", "A park bench for the resting of tired legs.")
     # FORREST CABIN
     verb(forrest_cabin, "birdhouse", "No birds.", verb="listen")
@@ -312,25 +283,10 @@ def world():
     verb(lake, "lake", "the water is very cold, but not deep.")
     make_path(lake, forrest)
     verb(lake, "walnut tree", "The fruit feel like wallnuts.")
-    spawn_bunny(lake)
     make_path(lake, tower)
     verb(lake, "berry bush", "better leave them alone, might be poisonous.", verb="taste")
     make_path(forrest, deep_forrest)
     # WIZARD TOWER
-    def spawn_wizard(where):
-        creature = where.add(Mob(
-            "wizard", 
-            "you can hear sparkles and magic...a wizard!", 
-            "some dust under a robe"
-        ))
-        creature.hp = 15
-        creature.ap = 5
-        creature.xp = 250
-        creature.cash = randint(100, 200)
-        creature.attack = 10
-        creature.sensitivity = None
-
-    spawn_wizard(tower)
     tower_door = verb(tower, "tower entrance", "the seams betrays a large stone door")
     tower_door.add(Return("open", "it is magically sealed"))
     verb(tower, "fern", "these leafs are unmistakenly fern-like")
@@ -338,37 +294,20 @@ def world():
     verb(forrest, "tree", "Not quite sure what kind of tree this is.")
     make_path(forrest, candy_house)
     verb(forrest, "mushrooms", "a small group of mushrooms")
-    spawn_bunny(forrest)
     make_path(forrest, waterfall) 
     verb(forrest, "boulder", "a decently sized boulder sticking out of the dirt")
     verb(river, "river", "Riverrun, past Eve and Adam's, from swerve of shore to bend of bay")
     # DEEP FORREST
-    def spawn_unicorn(where):
-        creature = where.add(Mob(
-            "unicorn", 
-            "you can hear a horse, sparkles and magic...a unicorn!", 
-            "it's completely dead"
-        ))
-        creature.hp = 50
-        creature.ap = 50
-        creature.xp = 1000
-        creature.cash = randint(300, 500)
-        creature.attack = 10
-        creature.sensitivity = "green"
-
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
-    spawn_unicorn(deep_forrest)
     make_path(river, deep_forrest)
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
-    spawn_bunny(deep_forrest)
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
     make_path(deep_forrest, clearing)
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
     verb(deep_forrest, "foliage", "a cluster of trees and shrubs")
     # STRANGE ROCK
     make_path(clearing, strange_rock)
-    spawn_unicorn(strange_rock)
     verb(strange_rock, "strange rock", "An enormous strange, vibrating stone")
     # BONFIRE
     make_path(clearing, bonfire)

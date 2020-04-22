@@ -1,3 +1,4 @@
+from random import randint
 from panda3d.core import TextNode
 from panda3d.core import NodePath
 from direct.interval.IntervalGlobal import LerpFunctionInterval, Func, Wait
@@ -18,6 +19,7 @@ def make_text(text_string, color=(1,1,1,1)):
 
 
 def change_room(destination):
+    destination.init()
     base.interface.room.node.detach_node()
     if destination.song:
         base.play_music(destination.song)
@@ -31,6 +33,11 @@ def change_room(destination):
     base.interface.current = base.interface.room
     base.interface.current.node.reparent_to(render)
 
+    current = base.interface.current.get_current()
+    current.init()
+    if current.freeze:
+        base.interface.current.freeze = True
+    
 
 class Option():
     def __init__(self, name, description=None):
@@ -44,6 +51,7 @@ class Option():
         self.function = None
         self.text = make_text(name)
         self.text.reparent_to(self.node)
+        self.function_once = False
 
     def init(self):
         pass
@@ -80,6 +88,8 @@ class Option():
             base.interface.say(self.description)
         if self.function:
             self.function(self, activator)
+            if self.function_once:
+                self.function = None
 
     def update(self, context):
         pass
@@ -95,6 +105,8 @@ class Stay(Option):
             base.interface.say(self.description)
         if self.function:
             self.function()
+            if self.function_once:
+                self.function = None
         base.interface.current.show()
 
          
@@ -109,7 +121,8 @@ class Return(Option):
             base.interface.say(self.description)
         if self.function:
             self.function()
-
+            if self.function_once:
+                self.function = None
 
 class Menu(Option):
     def __init__(self, name):
@@ -147,6 +160,8 @@ class Menu(Option):
             base.interface.say(self.description)
         if self.function:
             self.function()
+            if self.function_once:
+                self.function = None
 
     def select(self):
         base.sounds["accept"].play()
@@ -252,6 +267,7 @@ class Money(Item):
         base.interface.say("There are "+str(self.quantity)+" gold pieces")
 
     def add_to_inventory(self):
+        base.sounds["money"].play()
         base.interface.money.quantity += self.quantity
 
 
@@ -274,6 +290,7 @@ class Equipment(Item):
         if base.interface.equipment[self.bodypart]:
             base.interface.equipment[self.bodypart].text.node().text = self.name
         base.interface.equipment[self.bodypart] = self
+        base.sounds["equip"].play()
         self.text.node().text = self.name+" (equipped)"
         base.interface.say("You equip the " + self.name)
         base.interface.inventory.deactivate()
@@ -352,7 +369,7 @@ class Use(Return):
                 self.working_option == base.interface.room.get_current()):
             if self.function:
                 self.function(self, activator)
-                if self.single_use:
+                if self.function_once:
                     self.function = None
             else:
                 base.interface.say(self.description)
@@ -415,7 +432,7 @@ class Door(Menu):
 
 
 class Rolodex(Option):
-    def __init__(self, name, song=None, explored=False):
+    def __init__(self, name, song=None, explored=False, spawn=None):
         Option.__init__(self, name)
         self.partition = 0
         self.selection = 0
@@ -424,6 +441,19 @@ class Rolodex(Option):
         self.rotating = False
         self.song = song
         self.explored = explored
+        self.spawn = spawn
+        self.spawned = None
+
+    def init(self):
+        if self.spawn:
+            if self.spawned:
+                if self.spawned.dead:
+                    self.remove(self.spawned)
+                    self.spawned = None
+            if not self.spawned:
+                self.spawned = self.spawn()
+                if self.spawned:
+                    self.add(self.spawned, len(self.options))
 
     def get_current(self):
         return self.options[self.selection]
@@ -445,9 +475,12 @@ class Rolodex(Option):
             option.node.set_h(-(o*self.partition))
             option.text.set_y(80)
 
-    def add(self, option):
+    def add(self, option, index=None):
         option.parent = self
-        self.options.append(option)
+        if index:
+            self.options.insert(index, option)
+        else:
+            self.options.append(option)
         option.node.reparent_to(self.node)
         self.realign()
         return option
@@ -540,7 +573,26 @@ def make_open_door(a, b, name, description="a regular wooden door"):
     b.add(Door(destination=a, name=name, mimic=door))
     return door
 
-def verb(location, name, description, verb="feel"):
+
+def amprand(min, max, rate=2):
+    for i in range(max-min):
+        min += 1
+        if randint(0,int((max-min)/rate)) == 1:
+            break
+    return min
+
+def find_money():
+    amount = amprand(10,250, 4)
+    base.sounds["money"].play()
+    base.interface.money.quantity += amount
+    base.interface.say("What's this!? There's {} gold here!".format(amount))
+
+def verb(location, name, description, verb="feel", has_money=True):
     option = location.add(Menu(name))
-    option.add(Return(verb, description))
+    r = option.add(Return(verb, description))
+    r.function_once = True
+    if verb=="feel" and has_money:
+        if randint(0,10) == 1:
+            r.function = find_money
+    
     return option

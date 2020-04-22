@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 from direct.interval.IntervalGlobal import Func, Wait, SoundInterval
 from options import *
 
@@ -9,8 +9,10 @@ class Mob(Menu):
         self.name = name
         self.empty()
         self.freeze = True
-        self.add(Stay("listen", life_description)).function = self.meet
+        self.listen = self.add(Stay("listen", life_description))
+        self.listen.function = self.meet
         self.death_description = death_description
+        self.run = self.add(Return("run", "you try to run away!", self.run))
         self.defend = self.add(Return("defend", "you defend!", self.defend))
         self.attack = self.add(Return("attack", "you attack!", self.attack))
         self.text.node().text_color = (1,0,0,1)
@@ -20,6 +22,7 @@ class Mob(Menu):
         self.xp = 10
         self.cash = randint(0,10)
         self.attack = 1
+        self.dead = False
 
     def meet(self):
         if not self.name in base.interface.creature_codex:
@@ -36,8 +39,11 @@ class Mob(Menu):
         )
     
     def die(self):
+        self.options.remove(self.listen)
+        self.listen.node.detach_node()
         base.interface.say("It dies.")
         self.meet()
+        self.dead = True
         self.node.name = "dead " + self.name
         self.text.node().text = "dead " + self.name
         self.text.node().text_color = (0.5,0,0,1)
@@ -88,6 +94,15 @@ class Mob(Menu):
         if base.interface.hp < 0:
             base.interface.die()
 
+    def run(self):
+        if randint(0, 1) == 0:
+            base.interface.say("You run away")
+            self.parent.freeze = False
+            self.parent.rotate(choice(-1,1))            
+        else:
+            base.interface.say("...but you couldn't!")
+            self.turn()
+
     def defend(self):
         self.player_is_defending = True
         self.turn()
@@ -125,6 +140,4 @@ class Mob(Menu):
             base.transition.fadeOut(0)
             base.transition.fadeIn(0.1)
             base.play_music("battlesong")
-            # TODO: If speed > playerspeed: fight first
-            base.interface.say("Oh my goooood! It's a "+self.node.name)
-    
+            # TODO: If speed > playerspeed: fight first    

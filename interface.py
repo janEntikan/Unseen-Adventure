@@ -31,6 +31,7 @@ class Interface():
         self.location.set_z(0.1)
 
         self.hp = 10
+        self.max_hp = 10
         self.status = "normal"
         self.level = 1
         self.xp = 0
@@ -48,8 +49,15 @@ class Interface():
         self.character.add(Option("level")).function=get_level
         self.character.add(Option("experience")).function=get_xp
 
+        self.dead = Rolodex("dead")
+        self.dead.add(Option("You died."))
+
+
     def die(self):
+        change_room(self.dead)
         base.play_music(None)
+        base.sounds["youdie"].play()
+        self.location.node().text = "dead"
         self.say("You die...")
         self.money.quantity = int(self.money.quantity/4)
         base.transition.setFadeColor(0.1,0,0)
@@ -59,7 +67,9 @@ class Interface():
             Wait(3),
             Func(change_room, self.checkpoint),
             Func(base.transition.fadeIn, 2),
-            Func(self.say, "...and wake up!")
+            Func(self.say, "...and wake up!"),
+            Wait(1),
+            Func(self.say, "...you lost most of your money!")
         )
         
     def say(self, output_string):

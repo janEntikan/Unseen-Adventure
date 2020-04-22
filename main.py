@@ -49,8 +49,8 @@ class GameApp(ShowBase):
             "accept", "back", "error", 
             "rotate", "select", "move",
             "hit0", "hit1", "hit2", "hit3",
-            "down", "upup", 
-            "door_open", "door_close",
+            "down", "upup", "money", "equip",
+            "door_open", "door_close", "youdie"
         )
         musics = (
             "home", "town", "shop", "tension",
