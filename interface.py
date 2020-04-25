@@ -1,5 +1,5 @@
 import sys
-from panda3d.core import TextNode
+from panda3d.core import TextNode, TextProperties, TextPropertiesManager
 
 from options import *
 from world import world
@@ -49,6 +49,15 @@ class Interface():
             base.interface.say("Defence: {}.".format(self.stats["defence"]))
             base.interface.say("Endurance: {}.".format(self.stats["endurance"]))
 
+        manager = TextPropertiesManager.getGlobalPtr()
+        tp = TextProperties()
+        tp.setTextColor((0.2,0.2,0.2,1))
+        manager.setProperties("grey", tp)
+        tp = TextProperties()
+        tp.setTextColor((1,1,1,1))
+        manager.setProperties("white", tp)
+
+
         self.character.add(Option("inventory")).function=self.open_inventory
         self.character.add(Option("health")).function=get_health
         self.character.add(Option("stats")).function=get_stats
@@ -85,7 +94,9 @@ class Interface():
         output = ""
         for s, string in enumerate(self.to_output):
             if s == len(self.to_output)-1:
-                output += "> "
+                output += "\1white\1> "
+            else:
+                output += "\1grey\1"
             output+=string+"\n"
         self.output.node().text = output
 

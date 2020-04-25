@@ -73,8 +73,8 @@ class Mob(Menu):
                 if item.element:
                     if item.element == self.sensitivity:
                         ap *= 1.5
-        attack -= base.interface.stats["defence"]
         attack = int(self.attack-ap)
+        attack -= base.interface.stats["defence"]
         if attack < 1: attack = 1
         base.interface.hp -= attack
         base.start_sequence(            
@@ -89,16 +89,16 @@ class Mob(Menu):
 
     def kill_player(self):
         maxhp = base.interface.max_hp + base.interface.stats["endurance"]
-        if base.interface.hp < maxhp/2:
-            base.interface.say("You're in some pain.")
-        elif base.interface.hp < maxhp/3:
-            base.interface.say("You're in a lot of pain.")
-        elif base.interface.hp < maxhp/4:
-            base.interface.say("You're bleeding profusely.")
+        if base.interface.hp < 0:
+            base.interface.die()
         elif base.interface.hp < maxhp/5:
             base.interface.say("You're almost dying.")
-        elif base.interface.hp < 0:
-            base.interface.die()
+        elif base.interface.hp < maxhp/4:
+            base.interface.say("You're bleeding profusely.")
+        elif base.interface.hp < maxhp/3:
+            base.interface.say("You're in a lot of pain.")
+        elif base.interface.hp < maxhp/2:
+            base.interface.say("You're in some pain.")
 
     def run(self):
         if randint(0, 1) == 0:

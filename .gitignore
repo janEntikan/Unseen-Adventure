@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 built_assets/
 *.blend1
+.egg/
+build/
+dist/
+screenshots/

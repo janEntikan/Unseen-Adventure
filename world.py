@@ -28,7 +28,6 @@ def world():
     castle_gate = Rolodex("castle gate", "town", True)
     castle = Rolodex("castle","tension")
     courtroom = Rolodex("courtroom","shop")
-    make_open_door(castle_gate, castle, "castle door") 
     guard = castle.add(NPC("castle guard", [
         "You can't just walk into the castle like that.",
         "The king is too busy to see the likes of you.",
@@ -287,7 +286,7 @@ def world():
     make_open_door(neighbour, tover_house, "front door")
     verb(neighbour, "small tree", "a very dry old pine tree.")
     tover = tover_house.add(NPC("miss tover", [
-        "Ah it's you. Can do anything for you?",
+        "Ah it's you. Can I do anything for you?",
         "I haven't stepped outside this town in over 30 years.",
         "Did you ever leave the city?",
         "My son David works in the mines.",
@@ -345,7 +344,8 @@ def world():
             base.interface.money.quantity += 1000
         else:
             base.interface.say("Fisherman: there are still lobsters in the harbor.")
-    
+    on_fish_quest.function = is_on_fish_quest
+
     verb(inn_seat, "menu", "A flat foldable square.", verb="feel")
     verb(inn_seat, "table", "You drum a little rythm.", verb="drum")
     verb(inn_seat, "candle", "It's sitting on a sturdy candle holder.")

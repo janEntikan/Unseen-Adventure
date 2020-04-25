@@ -24,11 +24,20 @@ class GameApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         pman.shim.init(self)
+        info = self.pipe.getDisplayInformation()
+        for idx in range(info.getTotalDisplayModes()):
+            width = info.getDisplayModeWidth(idx)
+            height = info.getDisplayModeHeight(idx)
+            bits = info.getDisplayModeBitsPerPixel(idx)
+        wp = WindowProperties()
+        wp.set_size(width, height)
+        base.win.requestProperties(wp)
         self.win.set_clear_color((0.03,0.03,0.03,1))
         add_device_listener(
             config_file='keybindings.toml',
             assigner=SinglePlayerAssigner(),
         )
+        base.disableMouse() 
         self.dt = globalClock.get_dt()
         self.transition = Transitions(loader)
         self.font = loader.load_font("probe.ttf")

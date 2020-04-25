@@ -294,7 +294,7 @@ class Equipment(Item):
     def post_take(self):
         self.add(self.equip_option)
 
-    def equip(self, activator):
+    def equip(self):
         if not self.bodypart in base.interface.equipment:
             base.interface.equipment[self.bodypart] = None
         if base.interface.equipment[self.bodypart]:
