@@ -19,7 +19,6 @@ class Mob(Menu):
         self.sensitivity = None
         self.hp = 1
         self.ap = 1
-        self.xp = 10
         self.cash = randint(0,10)
         self.attack = 1
         self.dead = False
@@ -55,12 +54,9 @@ class Mob(Menu):
         self.selection = 0
         self.add(Return("nevermind", "you leave it"))
         self.add(Return("feel", self.death_description))
-        s = "You "
-        if self.cash > 0:
-            s = "You find {} gold and ".format(self.cash)
-        s += "recieve {} xp.".format(self.xp)
+        self.cash += self.xp
+        s = "You find {} gold".format(self.cash)
         base.interface.say(s)
-        base.interface.xp += self.xp
         base.interface.money.quantity += self.cash
 
     def hurt(self, color):
@@ -77,6 +73,7 @@ class Mob(Menu):
                 if item.element:
                     if item.element == self.sensitivity:
                         ap *= 1.5
+        attack -= base.interface.stats["defence"]
         attack = int(self.attack-ap)
         if attack < 1: attack = 1
         base.interface.hp -= attack
@@ -91,7 +88,16 @@ class Mob(Menu):
         self.player_is_defending = False
 
     def kill_player(self):
-        if base.interface.hp < 0:
+        maxhp = base.interface.max_hp + base.interface.stats["endurance"]
+        if base.interface.hp < maxhp/2:
+            base.interface.say("You're in some pain.")
+        elif base.interface.hp < maxhp/3:
+            base.interface.say("You're in a lot of pain.")
+        elif base.interface.hp < maxhp/4:
+            base.interface.say("You're bleeding profusely.")
+        elif base.interface.hp < maxhp/5:
+            base.interface.say("You're almost dying.")
+        elif base.interface.hp < 0:
             base.interface.die()
 
     def run(self):
@@ -117,6 +123,7 @@ class Mob(Menu):
                 if item.element:
                     if item.element == self.sensitivity:
                         attack *= 1.5
+        attack += base.interface.stats["offence"]
         attack = int(attack-self.ap)
         if attack < 1: attack = 1
         self.hp -= attack

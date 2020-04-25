@@ -1,3 +1,4 @@
+import sys
 from panda3d.core import TextNode
 
 from options import *
@@ -14,10 +15,9 @@ class Interface():
         self.output.set_z(-0.75)
         self.to_output = ["","","", ""]
         self.inventory = Inventory()
-        self.money = self.inventory.add(Money(10, True))
+        self.money = self.inventory.add(Money(0, True))
         self.inventory.hide()
-        self.say("press i for inventory")
-        self.say("press c to check yourself")
+        self.say("press escape for menu")
         self.room, self.checkpoint, self.test = world()  
         self.room.node.reparent_to(render)
         base.play_music(self.room.song)
@@ -32,23 +32,32 @@ class Interface():
 
         self.hp = 10
         self.max_hp = 10
-        self.status = "normal"
-        self.level = 1
-        self.xp = 0
+        self.stats = {
+            "offence":0,
+            "defence":0,
+            "endurance":0,
+            "magic":0,
+        }
         self.equipment = {}
         self.creature_codex = []
 
         self.character = Inventory()
         self.character.hide()
-        def get_health(a,b): return base.interface.say("You have {} hp.".format(self.hp))
-        def get_status(a,b): return base.interface.say("Your status is {}.".format(self.status))
-        def get_level(a,b): return base.interface.say("Your level is {}.".format(self.level))
-        def get_xp(a,b): return base.interface.say("You have {} xp.".format(self.xp))
-        self.character.add(Option("health")).function=get_health
-        self.character.add(Option("status")).function=get_status
-        self.character.add(Option("level")).function=get_level
-        self.character.add(Option("experience")).function=get_xp
+        def get_health(): 
+            base.interface.say("You have {}/{} hp.".format(self.hp, self.max_hp+self.stats["endurance"]))
+        def get_stats(): 
+            base.interface.say("Offence: {}.".format(self.stats["offence"]))
+            base.interface.say("Defence: {}.".format(self.stats["defence"]))
+            base.interface.say("Endurance: {}.".format(self.stats["endurance"]))
+            base.interface.say("Magic: {}.".format(self.stats["magic"]))
 
+        self.character.add(Option("inventory")).function=self.open_inventory
+        self.character.add(Option("health")).function=get_health
+        self.character.add(Option("stats")).function=get_stats
+        quit = self.character.add(Menu("quit game"))
+        quit.empty()
+        quit.add(Return("yes, quit!", "")).function = sys.exit
+        quit.add(Return("no, keep playing!", ""))
         self.dead = Rolodex("dead")
         self.dead.add(Option("You died."))
 
@@ -82,6 +91,14 @@ class Interface():
             output+=string+"\n"
         self.output.node().text = output
 
+    def open_inventory(self):
+        if not self.room == self.current:
+            self.current.deactivate()
+        base.sounds["back"].play()
+        self.inventory.show()
+        self.current = self.inventory
+
+
     def update(self):
         context = base.device_listener.read_context('ta')
         if context["inventory"] and not self.current == self.character:
@@ -90,12 +107,8 @@ class Interface():
                 self.inventory.hide()
                 self.current = self.room
             else:
-                if not self.room == self.current:
-                    self.current.deactivate()
-                base.sounds["back"].play()
-                self.inventory.show()
-                self.current = self.inventory
-        if context["character"] and not self.current == self.inventory:
+                self.open_inventory()
+        if (context["character"] or context["menu"]) and not self.current == self.inventory:
             if not self.current == self.character:
                 base.sounds["back"].play()
                 self.current = self.character

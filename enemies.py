@@ -32,6 +32,21 @@ def _crab():
     if randint(0,1)==1:
         return creature
 
+def _lobster():
+    creature = Mob(
+        "giant lobster", 
+        "it makes a click-clacking noise, almost like...a giant crab!", 
+        "a pile of cans, claws and shells"
+    )
+    creature.hp = 7
+    creature.ap = 8
+    creature.xp = 250
+    creature.cash = randint(50, 100)
+    creature.attack = 4
+    creature.sensitivity = "blue"
+    return creature
+
+
 def _goat():
     creature = Mob(
         "demon goat", 
@@ -47,6 +62,21 @@ def _goat():
     if randint(0,1)==1:
         return creature
     return creature
+
+def _rockman():
+    creature = Mob(
+        "rock monster", 
+        "sounds like rolling rocks...like a rock monster!", 
+        "a pile of pebbels, rubble and rocks"
+    )
+    creature.hp = 4
+    creature.ap = 8
+    creature.xp = 250
+    creature.cash = randint(50, 100)
+    creature.attack = 5
+    creature.sensitivity = "red"
+    if randint(0,1)==1:
+        return creature
 
 def _robber():
     creature = Mob(
@@ -68,11 +98,39 @@ def _wizard():
         "you can hear sparkles and magic...a wizard!", 
         "some dust and intestines under a robe"
     )
-    creature.hp = 15
-    creature.ap = 5
+    creature.hp = 20
+    creature.ap = 10
     creature.xp = 250
     creature.cash = randint(100, 200)
     creature.attack = 10
+    creature.sensitivity = None
+    return creature
+
+def _strange_creature():
+    creature = Mob(
+        "strange creature", 
+        "you're not sure...some strange creature!", 
+        "it's still vibrating"
+    )
+    creature.hp = 30
+    creature.ap = 10
+    creature.xp = 500
+    creature.cash = randint(200, 300)
+    creature.attack = 15
+    creature.sensitivity = None
+    return creature
+
+def _scary_creature():
+    creature = Mob(
+        "very scary creature", 
+        "you're not sure...some very scary creature!", 
+        "it's still vibrating and pulsating"
+    )
+    creature.hp = 50
+    creature.ap = 15
+    creature.xp = 750
+    creature.cash = randint(200, 300)
+    creature.attack = 20
     creature.sensitivity = None
     return creature
 

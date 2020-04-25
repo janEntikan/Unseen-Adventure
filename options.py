@@ -244,7 +244,7 @@ class Item(Menu):
     def post_take(self):
         pass
 
-    def take(self, activated, activator):
+    def take(self):
         if self.cost > 0:
             if base.interface.money.quantity >= self.cost:
                 base.interface.say("You buy the " + self.node.name)
@@ -294,7 +294,7 @@ class Equipment(Item):
     def post_take(self):
         self.add(self.equip_option)
 
-    def equip(self, activated, activator):
+    def equip(self, activator):
         if not self.bodypart in base.interface.equipment:
             base.interface.equipment[self.bodypart] = None
         if base.interface.equipment[self.bodypart]:
@@ -319,7 +319,6 @@ class Move(Option):
         # 	False = Face the same direction as previous room
         #	None = Rotate to first option
         self.sound = "move"
-
 
     def is_known(self):
         if self.destination.explored:
