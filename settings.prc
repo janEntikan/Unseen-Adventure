@@ -1,3 +1,2 @@
-window-title Gridfly
-icon-filename icons/icon.ico
+window-title Unseen Adventure
 audio-library-name p3openal_audio
