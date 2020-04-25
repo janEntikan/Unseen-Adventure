@@ -55,12 +55,12 @@ class GameApp(ShowBase):
         )
         musics = (
             "home", "town", "shop", "tension",
-            "forrest", "battlesong", "battlestart",
+            "forrest", "battlesong",
         )
         for sound in sounds:
             self.sounds[sound] = loader.load_sfx("sound/{}.wav".format(sound))
         for music in musics:
-            self.music[music] = loader.load_sfx("music/{}.wav".format(music))
+            self.music[music] = loader.load_sfx("music/{}.ogg".format(music))
             self.music[music].set_volume(0.25)
 
     def play_music(self, music=None):
