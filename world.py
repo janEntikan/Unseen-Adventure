@@ -23,7 +23,6 @@ def world():
     inn_seat = Rolodex("seat", "shop")
     alley = Rolodex("alley", "tension")
     town_center = Rolodex("town square", "town", True)
-    magicshop = Rolodex("magicshop", "shop")
     armory = Rolodex("armory", "shop")
     training = Rolodex("training", "shop")
     castle_gate = Rolodex("castle gate", "town", True)
@@ -364,20 +363,6 @@ def world():
     inn.add(Move("seat", inn_seat, "you take a seat")) 
     inn.add(Move("seat", inn_seat, "you take a seat")) 
     inn.add(Move("seat", inn_seat, "you take a seat")) 
-    # MAGIC SHOP
-    make_open_door(town_center, magicshop, "magicshop door")  
-    magicshop.add(Item("red potion", cost=50))
-    magicshop.add(Item("green potion", cost=50))
-    magicshop.add(Item("blue potion", cost=50))
-    magicshop.add(NPC("magician", [
-        "Spells and curses for sale.",
-        "Careful, that's very unstable!",
-        "I can tell you have a good ear for magic.",
-        "Magic, ladies and gentlemen.",
-    ]))
-    magicshop.add(Equipment("blue pendant", "necklace", cost=500))
-    magicshop.add(Equipment("green pendant", "necklace", cost=500))
-    magicshop.add(Equipment("red pendant", "necklace", cost=500))
     # TRAINER
     make_open_door(town_center, training, "trainer door")
 
@@ -418,7 +403,6 @@ def world():
         "Are you pumped yet?",
     ]))
     training.add(Trainer("endurance"))
-    training.add(Trainer("magic"))
     # CASTLE
     make_path(castle_gate, town_center)
     make_open_door(castle_gate, castle, "castle door") 

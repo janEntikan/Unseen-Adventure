@@ -36,7 +36,6 @@ class Interface():
             "offence":0,
             "defence":0,
             "endurance":0,
-            "magic":0,
         }
         self.equipment = {}
         self.creature_codex = []
@@ -49,7 +48,6 @@ class Interface():
             base.interface.say("Offence: {}.".format(self.stats["offence"]))
             base.interface.say("Defence: {}.".format(self.stats["defence"]))
             base.interface.say("Endurance: {}.".format(self.stats["endurance"]))
-            base.interface.say("Magic: {}.".format(self.stats["magic"]))
 
         self.character.add(Option("inventory")).function=self.open_inventory
         self.character.add(Option("health")).function=get_health
