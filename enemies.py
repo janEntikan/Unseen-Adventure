@@ -23,8 +23,8 @@ def _crab():
         "it makes a click-clacking noise, almost like...a giant crab!", 
         "a pile of cans, claws and shells"
     )
-    creature.hp = 5
-    creature.ap = 5
+    creature.hp = 4
+    creature.ap = 3
     creature.xp = 200
     creature.cash = randint(25, 75)
     creature.attack = 4
@@ -39,7 +39,7 @@ def _lobster():
         "a pile of cans, claws and shells"
     )
     creature.hp = 7
-    creature.ap = 8
+    creature.ap = 4
     creature.xp = 350
     creature.cash = randint(50, 100)
     creature.attack = 4

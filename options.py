@@ -378,6 +378,7 @@ class Use(Return):
                 self.working_option == base.interface.room.get_current()):
             if self.function:
                 self.function()
+                base.sounds["upup"].play()
                 if self.parent.function_once:
                     self.function = None
                     base.interface.inventory.remove(self.parent)

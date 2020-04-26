@@ -389,7 +389,7 @@ def world():
                 base.interface.stats[self.stat] += 1
                 stat = base.interface.stats[self.stat]
                 base.interface.money.quantity -= cost
-                base.interface.say("Your {} is not at {}".format(self.stat, stat))
+                base.interface.say("Your {} is now at {}".format(self.stat, stat))
 
         def print_cost(self):
             cost = base.interface.stats[self.stat]*2*100
@@ -576,7 +576,7 @@ def world():
     davids_quest = Return("quest", "")
     davids_quest.function_once = True
     def david_quest():
-        base.sounds["quest_found"].play()
+        base.sounds["quest_success"].play()
         david.remove(davids_quest)
         david.lines = [
             "Can you please find my ring?",
@@ -584,6 +584,9 @@ def world():
             "You are really amazing for doing this.",
             "Most people don't help other's more than once.",
         ]
+        base.interface.say("David: Thank you so much. I have one last request?")
+        base.interface.say("You recieve 2000 gold")
+        base.interface.money.quantity += 2000
         base.interface.say("David: Can you please find my ring?")
         base.interface.say("David: I was robbed of it in the forrest.")
         bonfire.add(_robber())
