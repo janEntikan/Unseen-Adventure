@@ -164,7 +164,7 @@ def world():
             "You can enter, the king is waiting to see you.",
             "You're a hero, did you know that?"
         ]
-        make_open_door(castle, courtroom, "large door")
+        make_open_door(castle, courtroom, "large door", description="there's carvings of lions on here")
         change_room(strange_rock)      
     found_princess.function = princess_found
     found_princess.function_once = True
@@ -283,7 +283,7 @@ def world():
     make_path(town_center, road)
     # MISS TOVER
     verb(neighbour, "flowers", "Miss Tover likes flowers almost as much as you do")
-    make_open_door(neighbour, tover_house, "front door")
+    make_open_door(neighbour, tover_house, "front door", "there's a heart-shaped hole in it")
     verb(neighbour, "small tree", "a very dry old pine tree.")
     tover = tover_house.add(NPC("miss tover", [
         "Ah it's you. Can I do anything for you?",
@@ -293,7 +293,7 @@ def world():
     ]))
     # TOWN CENTER
         # ARMORY
-    make_open_door(town_center, armory, "armory door")
+    make_open_door(town_center, armory, "armory door", "it's inforced with steel")
     armory.add(Equipment("wooden sword", "weapon", 50, 2, 0))
     armory.add(Equipment("iron sword", "weapon", 2500, 16, 0))
     armory.add(Equipment("steel sword", "weapon", 5000, 32, 0))
@@ -317,7 +317,7 @@ def world():
         "you're getting on my nerves.",
     ]))
         # INN
-    make_open_door(town_center, inn, "inn door")
+    make_open_door(town_center, inn, "inn door", "the hinges are remarkably smooth")
             # seat
     fisherman = inn.add(NPC("fisherman", [
         "We fishermen need to stick together.",
@@ -366,7 +366,7 @@ def world():
     inn.add(Move("seat", inn_seat, "you take a seat")) 
     inn.add(Move("seat", inn_seat, "you take a seat")) 
     # TRAINER
-    make_open_door(town_center, training, "trainer door")
+    make_open_door(town_center, training, "trainer door", "it's a bet wet. probably sweat")
 
     class Trainer(Menu):
         def __init__(self, stat):
@@ -407,7 +407,7 @@ def world():
     training.add(Trainer("endurance"))
     # CASTLE
     make_path(castle_gate, town_center)
-    make_open_door(castle_gate, castle, "castle door") 
+    make_open_door(castle_gate, castle, "castle door", "a large and heavy door with a smaller door in the middle.") 
     guard = castle.add(NPC("castle guard", [
         "You can't just walk into the castle like that.",
         "The king is too busy to see the likes of you.",
@@ -442,7 +442,7 @@ def world():
     verb(mountain_path, "cliff face", "an vertical, cold cliff face")
     verb(canyon_path, "stack of rocks", "someone has stacked some rocks on top of eachother")
     make_path(canyon_path, mountain_cabin)
-    make_open_door(mountain_cabin, in_mountain_cabin, "cabin door")
+    make_open_door(mountain_cabin, in_mountain_cabin, "cabin door", "it must be rotten")
     verb(in_mountain_cabin, "broken table", "this table is missing two legs")
     verb(in_mountain_cabin, "hole in floor", "the hole exposes a crack in the foundation")
     verb(in_mountain_cabin, "torn wallpaper", "there's a tear in the wallpaper here")
@@ -456,7 +456,7 @@ def world():
     # FORREST CABIN
     verb(forrest_cabin, "birdhouse", "No birds.", verb="listen")
     make_path(forrest_path, forrest_cabin)
-    make_open_door(forrest_cabin, in_forrest_cabin, "cabin door")
+    make_open_door(forrest_cabin, in_forrest_cabin, "cabin door", "it's not that sturdy.")
     verb(in_forrest_cabin, "dresser", "probably contains the old man's clothes")
     in_forrest_cabin.add(NPC("old man", [
         "Who's there?",
