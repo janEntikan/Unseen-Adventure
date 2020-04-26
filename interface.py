@@ -7,13 +7,18 @@ from world import world
 
 class Interface():
     def __init__(self):
+
+        self.said_this_frame = []
+        self.string_id = 0
         self.output = render2d.attach_new_node(TextNode("output text"))
         self.output.node().text = ""
         self.output.node().align = 2
         self.output.node().font = base.font
         self.output.set_scale(0.025, 0.025, 0.045)
         self.output.set_z(-0.75)
-        self.to_output = ["","","", ""]
+        self.to_output = []
+        for i in range(5):
+            self.say("")
         self.inventory = Inventory()
         self.money = self.inventory.add(Money(0, True))
         self.inventory.hide()
@@ -56,8 +61,6 @@ class Interface():
         tp = TextProperties()
         tp.setTextColor((1,1,1,1))
         manager.setProperties("white", tp)
-
-
         self.character.add(Option("inventory")).function=self.open_inventory
         self.character.add(Option("health")).function=get_health
         self.character.add(Option("stats")).function=get_stats
@@ -76,6 +79,7 @@ class Interface():
         self.say("You die...")
         self.money.quantity = int(self.money.quantity/4)
         base.transition.setFadeColor(0.1,0,0)
+        self.hp = self.max_hp + self.stats["endurance"]
         base.end_sequence()
         base.start_sequence(
             Func(base.transition.fadeOut, 2),
@@ -88,16 +92,20 @@ class Interface():
         )
         
     def say(self, output_string):
-        self.to_output.append(output_string)
+        self.string_id += 1
+        self.to_output.append((self.string_id, output_string))
+        self.said_this_frame.append((self.string_id, output_string))
         while len(self.to_output) > 4:
             self.to_output = self.to_output[1:]
         output = ""
         for s, string in enumerate(self.to_output):
-            if s == len(self.to_output)-1:
-                output += "\1white\1> "
+            if string in self.said_this_frame:
+                output += "\1white\1"
             else:
                 output += "\1grey\1"
-            output+=string+"\n"
+            if s == len(self.to_output)-1:
+                output += "> "
+            output+=string[1]+"\n"
         self.output.node().text = output
 
     def open_inventory(self):
@@ -128,3 +136,6 @@ class Interface():
                 self.current = self.room
 
         self.current.update(context)
+        self.said_this_frame = []
+        if self.string_id > 32:
+            self.string_id = 0

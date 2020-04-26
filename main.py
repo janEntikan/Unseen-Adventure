@@ -64,7 +64,8 @@ class GameApp(ShowBase):
         )
         musics = (
             "home", "town", "shop", "tension",
-            "forrest", "battlesong",
+            "forrest", "battlesong", "strange",
+            "tower", "mine", "ending", "title",
         )
         for sound in sounds:
             self.sounds[sound] = loader.load_sfx("sound/{}.wav".format(sound))
@@ -97,6 +98,7 @@ class GameApp(ShowBase):
             self.sequence = None
 
     def update(self, task):
+        self.interface.said_this_frame = []
         self.dt = globalClock.get_dt()
         if not self.sequence:
             self.interface.update()

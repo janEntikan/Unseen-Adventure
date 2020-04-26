@@ -348,11 +348,11 @@ class Move(Option):
             if self.mimic:
                 for o, option in enumerate(self.destination.options):
                     if option == self.mimic:
-                        self.destination.selection = int(o+(len(self.destination.options)/2))
+                        self.destination.selection = round(o+(len(self.destination.options)/2))
             elif self.parent.mimic:
                 for o, option in enumerate(self.destination.options):
                     if option == self.parent.mimic:
-                        self.destination.selection = int(o+(len(self.destination.options)/2))
+                        self.destination.selection = round(o+(len(self.destination.options)/2))
             else:
                 self.destination.get_closest_selection(base.interface.room.rotation)
 
@@ -378,10 +378,9 @@ class Use(Return):
                 self.working_option == base.interface.room.get_current()):
             if self.function:
                 self.function()
-                if self.function_once:
+                if self.parent.function_once:
                     self.function = None
-                    base.interface.inventory.options.remove(self.parent)
-                    self.parent.node.detach_node()
+                    base.interface.inventory.remove(self.parent)
             else:
                 base.interface.say(self.description)
         else:
@@ -603,7 +602,7 @@ def verb(location, name, description, verb="feel", has_money=True):
     r = option.add(Return(verb, description))
     r.function_once = True
     if verb=="feel" and has_money:
-        if randint(0,10) == 1:
+        if randint(0,2) == 1:
             r.function = find_money
     
     return option

@@ -6,7 +6,7 @@ from enemies import _strange_creature, _scary_creature, _lobster, _rockman
 
 def world():
     checkpoint = bedroom = Rolodex("bedroom", "home")
-    start_room = main_menu = Rolodex("Unseen adventure")
+    start_room = main_menu = Rolodex("Unseen adventure", song="title")
     main_menu.add(Move("start game", bedroom))
     main_menu.add(Option("credits", "Made by Hendrik-Jan with Panda3d"))
     quit = main_menu.add(Option("quit", "bye!"))
@@ -18,16 +18,16 @@ def world():
     garden = Rolodex("your home", "home", True)
     road = Rolodex("town road", "town", True)
     neighbour = Rolodex("miss tover's house", "home", True)
-    tover_house = Rolodex("tover house", "home")
-    inn = Rolodex("inn", "shop")
-    inn_seat = Rolodex("seat", "shop")
+    tover_house = Rolodex("tover house", "home", True)
+    inn = Rolodex("inn", "shop", True)
+    inn_seat = Rolodex("seat", "shop", True)
     alley = Rolodex("alley", "tension")
     town_center = Rolodex("town square", "town", True)
-    armory = Rolodex("armory", "shop")
-    training = Rolodex("training", "shop")
+    armory = Rolodex("armory", "shop", True)
+    training = Rolodex("training", "shop", True)
     castle_gate = Rolodex("castle gate", "town", True)
-    castle = Rolodex("castle","tension")
-    courtroom = Rolodex("courtroom","shop")
+    castle = Rolodex("castle","tension", True)
+    courtroom = Rolodex("courtroom","shop", True)
     guard = castle.add(NPC("castle guard", [
         "You can't just walk into the castle like that.",
         "The king is too busy to see the likes of you.",
@@ -47,13 +47,13 @@ def world():
     waterfall = Rolodex("waterfall", "forrest")
     verb(waterfall, "puddle", "you go splish splash", verb="splash")
     the_waterfall = verb(waterfall, "waterfall", "A fog of water sparkles in your face.")
-    ufo_entrance = Rolodex("cave entrance", _scary_creature)
-    cave = Rolodex("cave", "tension", _scary_creature)
-    ufo = Rolodex("strange device", _scary_creature)
-    bonfire = Rolodex("bonfire", "tension", _robber)
-    tower = Rolodex("wizard tower", "tension",spawn=_wizard)
+    ufo_entrance = Rolodex("cave entrance", spawn=_scary_creature)
+    cave = Rolodex("cave", song="strange", spawn=_scary_creature)
+    ufo = Rolodex("strange device", spawn=_scary_creature)
+    bonfire = Rolodex("bonfire", song="tension", spawn=_robber)
+    tower = Rolodex("wizard tower", song="tension",spawn=_wizard)
     forrest_cabin = Rolodex("cabin", "forrest", spawn=_bunny)
-    in_forrest_cabin = Rolodex("cabin", "tension")
+    in_forrest_cabin = Rolodex("cabin", song="tension")
     deep_forrest = Rolodex("deep forrest", "forrest", spawn=_unicorn)
     strange_rock = Rolodex("strange rock", "tension", spawn=_unicorn)
     mountain_path = Rolodex("canyon path", "forrest", spawn=_goat)
@@ -63,16 +63,16 @@ def world():
     mines = Rolodex("mine entrance", "tension", _rockman)
     # DUNGEONS
     # MINE DUNGEON
-    mine = Rolodex("mine opening", "tension", spawn=_rockman)
-    mine_a = Rolodex("corridor", "tension", spawn=_rockman)
-    mine_b = Rolodex("corridor", "tension", spawn=_rockman)
-    mine_c = Rolodex("corridor", "tension", spawn=_rockman)
-    mine_d = Rolodex("corridor", "tension", spawn=_rockman)
-    mine_e = Rolodex("room", "tension", spawn=_rockman)
-    mine_f = Rolodex("room", "tension", spawn=_rockman)
-    mine_g = Rolodex("corridor", "tension", spawn=_rockman)
-    mine_h = Rolodex("dead end", "tension", spawn=_rockman)
-    mine_i = Rolodex("dead end", "tension")
+    mine = Rolodex("mine opening", "mine", spawn=_rockman)
+    mine_a = Rolodex("corridor", "mine", spawn=_rockman)
+    mine_b = Rolodex("corridor", "mine", spawn=_rockman)
+    mine_c = Rolodex("corridor", "mine", spawn=_rockman)
+    mine_d = Rolodex("corridor", "mine", spawn=_rockman)
+    mine_e = Rolodex("room", "mine", spawn=_rockman)
+    mine_f = Rolodex("room", "mine", spawn=_rockman)
+    mine_g = Rolodex("corridor", "mine", spawn=_rockman)
+    mine_h = Rolodex("dead end", "mine", spawn=_rockman)
+    mine_i = Rolodex("dead end", "mine")
     make_path(mine, mine_a)
     make_path(mine_a, mine_e)
     make_path(mine_b, mine_e)
@@ -83,12 +83,12 @@ def world():
     make_path(mine_g, mine_f)
     make_path(mine_g, mine_i)
     # WIZ TOWER DUNGEON
-    tower_entrance = Rolodex("entrance", "tension")
-    wiz_1 = Rolodex("first floor", "tension", spawn=_wizard)
-    wiz_2 = Rolodex("second floor", "tension", spawn=_wizard)
-    wiz_3 = Rolodex("third floor", "tension", spawn=_wizard)
-    wiz_4 = Rolodex("fourth floor", "tension", spawn=_wizard)
-    wiz_5 = Rolodex("top floor", "tension", spawn=_wizard)
+    tower_entrance = Rolodex("entrance", "tower")
+    wiz_1 = Rolodex("first floor", "tower", spawn=_wizard)
+    wiz_2 = Rolodex("second floor", "tower", spawn=_wizard)
+    wiz_3 = Rolodex("third floor", "tower", spawn=_wizard)
+    wiz_4 = Rolodex("fourth floor", "tower", spawn=_wizard)
+    wiz_5 = Rolodex("top floor", "tower", spawn=_wizard)
     make_path(tower_entrance, wiz_1)
     verb(wiz_1, "torch", "you see as well without one", verb="take")
     wiz_1.add(_wizard())
@@ -112,12 +112,12 @@ def world():
     verb(wiz_5, "torch", "you see as well without one", verb="take")
     # STRANGE ROCK DUNGEON
     strange_world = Rolodex("portal", spawn=_strange_creature)
-    strange_1 = Rolodex("vibrating corridor", spawn=_strange_creature)
-    strange_2 = Rolodex("vibrating chamber", spawn=_strange_creature)
-    strange_3 = Rolodex("vibrating corridor", spawn=_strange_creature)
-    strange_4 = Rolodex("vibrating dead end", spawn=_strange_creature)
-    strange_5 = Rolodex("vibrating corridor", spawn=_strange_creature)
-    strange_6 = Rolodex("vibrating hall", spawn=_strange_creature)
+    strange_1 = Rolodex("vibrating corridor", song="strange", spawn=_strange_creature)
+    strange_2 = Rolodex("vibrating chamber", song="strange", spawn=_strange_creature)
+    strange_3 = Rolodex("vibrating corridor", song="strange", spawn=_strange_creature)
+    strange_4 = Rolodex("vibrating dead end", song="strange", spawn=_strange_creature)
+    strange_5 = Rolodex("vibrating corridor", song="strange", spawn=_strange_creature)
+    strange_6 = Rolodex("vibrating hall", song="strange", spawn=_strange_creature)
     make_path(strange_world, strange_1)
     make_path(strange_1, strange_2)
     make_path(strange_2, strange_3)
@@ -177,9 +177,9 @@ def world():
     make_path(cave, ufo)
     switch = Rolodex("long switch", spawn=_scary_creature)
     make_path(ufo, switch)
-    another_world = Rolodex("alternate dimension", spawn=_scary_creature)
+    another_world = Rolodex("alternate dimension", song="strange", spawn=_scary_creature)
     switch.add(Move("pull switch", another_world, "You hear a loud zap sound"))
-    the_end = Rolodex("the end")
+    the_end = Rolodex("the end", song="ending")
     verb(another_world, "strange plant", "It's unlike anything you know"),
     verb(another_world, "strange plant", "It's unlike anything you know"),
     another_world.add(Move("the end", the_end))
@@ -201,6 +201,7 @@ def world():
         base.interface.say("king: They are coming from the cave behind the waterfall.")
         base.interface.say("king: Take this and be careful, nobody has come out of it.")
         base.interface.say("You recieve 5000 gold.")
+        base.interface.money.quantity += 5000
         base.interface.say("The king gives you a tiny waterfall.")
         base.interface.inventory.add(waterfall_key)    
         waterfall_key.add(Return("feel", "Wet like a waterfall, fits in your pocket."))
@@ -245,7 +246,6 @@ def world():
     # LIVINGROOM
     verb(livingroom, "window", "you bathe in the sun's warmth")
     front_door = livingroom.add(Door(garden, "front door"))
-
     front_door.locked = "It won't open. It's locked."
         # WALL HOOKS
     hooks = Rolodex("wall hooks", explored=True)
@@ -259,7 +259,7 @@ def world():
             base.interface.say("You unlock the door with a satisfying click.")
         else:
             base.interface.say("It's already unlocked.")
-    key = hooks.add(Item("key"))
+    key = hooks.add(Item("front door key"))
     key.add(Return("feel", "It's a bit rusty."))
     key.add(Use(
         "use", "That doesn't work.", 
@@ -295,17 +295,19 @@ def world():
         # ARMORY
     make_open_door(town_center, armory, "armory door")
     armory.add(Equipment("wooden sword", "weapon", 50, 2, 0))
-    armory.add(Equipment("iron sword", "weapon", 500, 5, 0))
-    armory.add(Equipment("steel sword", "weapon", 1500, 10, 0))
+    armory.add(Equipment("iron sword", "weapon", 2500, 16, 0))
+    armory.add(Equipment("steel sword", "weapon", 5000, 32, 0))
+    armory.add(Equipment("champion sword", "weapon", 10000, 64, 0))
     armory.add(NPC("smith", [
         "What will it be, huh?",
         "Finest steel in the land!",
         "Bending steel is hard work.",
         "We have a special offer on wooden swords today.",
     ]))
-    armory.add(Equipment("leather armor", "armor", 250, 0, 5))
-    armory.add(Equipment("chain armor", "armor", 1000, 0, 10))
-    armory.add(Equipment("plate armor", "armor", 2500, 0, 25))
+    armory.add(Equipment("leather armor", "armor", 250, 0, 2))
+    armory.add(Equipment("chain armor", "armor", 5000, 0, 16))
+    armory.add(Equipment("plate armor", "armor", 8000, 0, 32))
+    armory.add(Equipment("crystal armor", "armor", 15000, 0, 64))
     verb(town_center, "well", "dank stones. the town's water supply.")
         # ALLEY
     make_path(town_center, alley)
@@ -340,8 +342,8 @@ def world():
             base.interface.say("Fisherman: Sweet gravy you've done it!")
             base.interface.say("Fisherman: Now we can finally start fishing again!")
             inn.remove(fisherman)
-            base.interface.say("He gives you 500 gold")
-            base.interface.money.quantity += 1000
+            base.interface.say("He gives you 2000 gold")
+            base.interface.money.quantity += 2000
         else:
             base.interface.say("Fisherman: there are still lobsters in the harbor.")
     on_fish_quest.function = is_on_fish_quest
@@ -536,9 +538,9 @@ def world():
             "Please find my son in the mines.",
             "Thank you so much!",
         ]
-        base.interface.say("Please find my son in the mines.")
-        base.interface.say("I haven't seen him in days.")
-        base.interface.say("You can show the foreman this to get in.")
+        base.interface.say("Ms. Tover: Please find my son in the mines.")
+        base.interface.say("Ms. Tover: I haven't seen him in days.")
+        base.interface.say("Ms. Tover: You can show the foreman this to get in.")
         entry = base.interface.inventory.add(Item("mine entry pass"))
         entry.function_once = True
         entry.add(Use(
@@ -563,8 +565,8 @@ def world():
         ]
         base.interface.say("david: My ring! This is amazing!")
         base.interface.say("david: I hope this is enough of a reward.")
-        base.interface.money.quantity += 1000
-        base.interface.say("You recieve 500 gold")
+        base.interface.money.quantity += 2000
+        base.interface.say("You recieve 2000 gold")
         base.interface.say("David gives you a bottle of magic-seal-away")
         sealaway = base.interface.inventory.add(Item("mine entry pass"))
         sealaway.function_once = True
@@ -577,9 +579,10 @@ def world():
         base.sounds["quest_found"].play()
         david.remove(davids_quest)
         david.lines = [
-            "I am eternally greatful.",
-            "Most people don't help other's more than once.",
+            "Can you please find my ring?",
+            "Robbers took it near a bonfire.",
             "You are really amazing for doing this.",
+            "Most people don't help other's more than once.",
         ]
         base.interface.say("David: Can you please find my ring?")
         base.interface.say("David: I was robbed of it in the forrest.")

@@ -10,7 +10,7 @@ class Mob(Menu):
         self.empty()
         self.freeze = True
         self.listen = self.add(Stay("listen", life_description))
-        self.listen.function = self.meet
+        self.listen.function = self.identify
         self.death_description = death_description
         self.run = self.add(Return("run", "you try to run away!", self.run))
         self.defend = self.add(Return("defend", "you defend!", self.defend))
@@ -21,7 +21,15 @@ class Mob(Menu):
         self.ap = 1
         self.cash = randint(0,10)
         self.attack = 1
+        self.player_is_defending = False
         self.dead = False
+
+    def identify(self):
+        if randint(0,2) > 0:
+            self.meet()
+        else:
+            base.interface.say("You can't quite make it out!")
+        self.turn()
 
     def meet(self):
         if not self.name in base.interface.creature_codex:
@@ -73,8 +81,13 @@ class Mob(Menu):
                 if item.element:
                     if item.element == self.sensitivity:
                         ap *= 1.5
-        attack = int(self.attack-ap)
-        attack -= base.interface.stats["defence"]
+        if self.player_is_defending:
+            ap *= 2
+        ap +=  base.interface.stats["defence"]
+
+        attack = int(self.attack-(ap/4))
+
+
         if attack < 1: attack = 1
         base.interface.hp -= attack
         base.start_sequence(            
@@ -119,12 +132,11 @@ class Mob(Menu):
             item = base.interface.equipment[bodypart]
             if item:
                 attack += item.attack
-                print(bodypart, item.attack)
                 if item.element:
                     if item.element == self.sensitivity:
                         attack *= 1.5
+        attack = int(attack-(self.ap/4))
         attack += base.interface.stats["offence"]
-        attack = int(attack-self.ap)
         if attack < 1: attack = 1
         self.hp -= attack
         base.sounds["hit{}".format(randint(1,3))].play()
