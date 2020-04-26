@@ -217,10 +217,13 @@ class NPC(Menu):
         self.talk.function = self.say
 
     def say(self):
-        base.interface.say(self.name+": "+self.lines[self.line])
-        self.line += 1
         if self.line >= len(self.lines):
             self.line = 0
+        try:
+            base.interface.say(self.name+": "+self.lines[self.line])
+            self.line += 1
+        except:
+            base.interface.say("but there wasn't much to say")
 
 
 class Item(Menu):
